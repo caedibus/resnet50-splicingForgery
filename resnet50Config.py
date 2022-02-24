@@ -119,9 +119,14 @@ plt.plot(epochs, acc)
 plt.plot(epochs, val_acc)
 plt.title('Training and validation accuracy')
 plt.legend(['Train','Val'])
+plt.savefig("acc.pdf")
 plt.figure() #Train accuracy
+
 plt.plot(epochs, loss)
 plt.plot(epochs, val_loss)
 plt.title('Training and validation loss')
 plt.legend(['Train','Val']) #Train Loss
-plt.show()
+# plt.show()
+
+
+plt.savefig("loss.pdf")
