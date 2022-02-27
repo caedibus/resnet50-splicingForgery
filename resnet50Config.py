@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 # import cv2
 import argparse
 import tensorflow as tf
-import tensorflow_addons as tfa
+
 from tensorflow import keras
 from keras.callbacks import CSVLogger
 from tensorflow.keras.models import Model, Sequential
@@ -19,7 +19,7 @@ from tensorflow.keras import optimizers
 ap = argparse.ArgumentParser()
 ap.add_argument("-t","--training", required=True, help="Path to training directory")
 ap.add_argument("-e", "--epochs", type =int, default = 20, help ="Number of epochs for training")
-ap.add_argument("-b", "--batchsize", type=int, default =25, help = "Number of batch size")
+ap.add_argument("-b", "--batchsize", type=int, default =32, help = "Number of batch size")
 # ap.add_argument("-v","--validation", required=True, help="Path to validation directory")
 args = vars(ap.parse_args())
 
@@ -96,7 +96,7 @@ model.compile(
     optimizer = adam,
     loss="binary_crossentropy",
     # loss="sparse_categorical_crossentropy",
-    metrics=['accuracy', tfa.metrics.FBetaScore(num_classes=2, average="micro", threshold=0.9)])
+    metrics=['accuracy'])
 
 #Save predictions to csv file
 # tf.keras.callbacks.CSVLogger('output history.csv', separator=",", append=False)
