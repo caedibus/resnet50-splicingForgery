@@ -4,7 +4,9 @@ import matplotlib.pyplot as plt
 # import cv2
 import argparse
 import tensorflow as tf
+import tensorflow_addons as tfa
 from tensorflow import keras
+from keras.callbacks import CSVLogger
 from tensorflow.keras.models import Model, Sequential
 from tensorflow.keras.applications.resnet50 import ResNet50
 from tensorflow.keras.applications.resnet50 import preprocess_input, decode_predictions
@@ -44,7 +46,7 @@ train_datagen = ImageDataGenerator(
 #Don't know if I need further preprocessing here:
 train_img_generator = train_datagen.flow_from_directory(
     directory = args["training"],
-    target_size=(224,224),
+    target_size=(IMG_SIZE,IMG_SIZE),
     batch_size = BATCH_SIZE,
     class_mode = 'binary',
     seed = SEED_VALUE,
@@ -55,8 +57,9 @@ img_validation_generator = ImageDataGenerator(preprocessing_function=preprocess_
 #Declare dataset for validation split
 validation_img_generator = img_validation_generator.flow_from_directory(
     directory = args["training"],
-    target_size = (224,224),
+    target_size = (IMG_SIZE,IMG_SIZE),
     batch_size = 10,
+    # batch_size = BATCH_SIZE,
     class_mode = 'binary',
     seed = SEED_VALUE,
     subset = 'validation'
@@ -88,18 +91,23 @@ model.layers[0].trainable=False
 model.summary()
 
 #Define optimizer function
-adam = tf.keras.optimizers.Adam(lr = 0.01, decay = 1e-6)
+adam = tf.keras.optimizers.Adam(learning_rate = 0.01, decay = 1e-6)
 model.compile(
     optimizer = adam,
     loss="binary_crossentropy",
     # loss="sparse_categorical_crossentropy",
-    metrics=['accuracy'])
+    metrics=['accuracy', tfa.metrics.FBetaScore(num_classes=2, average="micro", threshold=0.9)])
+
+#Save predictions to csv file
+# tf.keras.callbacks.CSVLogger('output history.csv', separator=",", append=False)
+csv_logger = CSVLogger('training.csv')
 
 history = model.fit(
     train_img_generator,
     epochs=EPOCHS,
     batch_size=BATCH_SIZE,
     verbose = 1,
+    callbacks = [csv_logger],
     validation_data=validation_img_generator
 )
 
