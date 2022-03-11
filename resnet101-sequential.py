@@ -33,7 +33,7 @@ EPOCHS = args["epochs"]
 BATCH_SIZE = args["batchsize"]
 TESTING_SIZE = 0.85
 VALIDATION_SIZE = 0.15
-IMG_SIZE = 224
+IMG_SIZE = 256
 SEED_VALUE = 30
 
 #Decalre dataset for training split
@@ -74,29 +74,26 @@ for layer in pretrained_resnet101.layers:
     layer.trainable = False
 #Define layers that will be put on top of the freezed Resnet1010 model
 output = pretrained_resnet101.layers[-1].output
-#output = keras.layers.Flatten()(output)
-
+# output = keras.layers.Flatten()(output)
 # output = pretrained_resnet101.layers[-2].output
 output = pretrained_resnet101.output
-pretrained_resnet101 = Model(inputs=pretrained_resnet101.input, outputs = output)
-
+# output = keras.layers.AveragePooling2D(pool_size=(7,7))(output)
 output = keras.layers.GlobalAveragePooling2D()(output)
 output = keras.layers.Flatten()(output)
 output = keras.layers.Dense(512, activation='relu')(output)
 output = keras.layers.Dropout(0.25)(output)
 output = keras.layers.Dense(1, activation='sigmoid')(output)
 
-
-pretrained_resnet101 = Model(inputs=pretrained_resnet101.input, output = output)
-
-#for layer in pretrained_resnet101.layers:
-#    layer.trainable = False
+pretrained_resnet101 = Model(inputs=pretrained_resnet101.input, outputs = output)
 
 pretrained_resnet101.summary()
 
 #Define optimizer function
-adam = tf.keras.optimizers.Adam(learning_rate = 0.001)
-sgd = tf.keras.optimizers.SGD(learning_rate = 0.0001)
+#Decay is used for smaller learning steps duing the last epochs
+#see: https://pyimagesearch.com/2019/07/22/keras-learning-rate-schedules-and-decay/
+# adam = tf.keras.optimizers.Adam(learning_rate = 0.001, decay = 1e-6)
+adam = tf.keras.optimizers.Adam(learning_rate = 0.0001)
+sgd = tf.keras.optimizers.SGD(learning_rate = 0.0001, momentum=0.9)
 
 print("Compile model:")
 pretrained_resnet101.compile(
