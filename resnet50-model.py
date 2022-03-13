@@ -8,7 +8,8 @@ import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras.callbacks import CSVLogger
 from tensorflow.keras.models import Model, Sequential
-from tensorflow.keras.applications.resnet import ResNet101
+# from tensorflow.keras.applications.resnet import ResNet101
+from keras_resnet.models import ResNet50, ResNet101, ResNet152
 # from tensorflow.keras.applications.resnet_v2.ResNet101V2 import ResNet101V2
 from tensorflow.keras.applications.resnet  import preprocess_input, decode_predictions
 # from tensorflow.keras.applications import ResNet101
@@ -70,7 +71,7 @@ validation_img_generator = img_validation_generator.flow_from_directory(
 inputTensor = keras.Input(shape=(IMG_SIZE, IMG_SIZE, 3))
 # inputTensor = Input(shape=(IMG_SIZE, IMG_SIZE, 3))
 
-pretrained_resnet101 = keras.applications.ResNet50(include_top=False, weights='imagenet', input_tensor=inputTensor)
+pretrained_resnet101 = keras.applications.ResNet101(include_top=False, weights='imagenet', input_tensor=inputTensor)
 
 for layer in pretrained_resnet101.layers:
     layer.trainable = False
@@ -82,8 +83,12 @@ output = pretrained_resnet101.output
 # output = keras.layers.AveragePooling2D(pool_size=(7,7))(output)
 output = keras.layers.GlobalAveragePooling2D()(output)
 output = keras.layers.Flatten()(output)
+output = keras.layers.Dense(1024, activation='relu')(output)
+output = keras.layers.Dropout(0.25)(output)
 output = keras.layers.Dense(512, activation='relu')(output)
 output = keras.layers.Dropout(0.25)(output)
+output = keras.layers.Dense(256, activation='relu')(output)
+output = keras.layers.Dropout(0.3)(output)
 output = keras.layers.Dense(1, activation='sigmoid')(output)
 
 pretrained_resnet101 = Model(inputs=pretrained_resnet101.input, outputs = output)
@@ -95,12 +100,12 @@ pretrained_resnet101.summary()
 #see: https://pyimagesearch.com/2019/07/22/keras-learning-rate-schedules-and-decay/
 # adam = tf.keras.optimizers.Adam(learning_rate = 0.001, decay = 1e-6)
 adam = tf.keras.optimizers.Adam(learning_rate = 0.0001)
-sgd = tf.keras.optimizers.SGD(learning_rate = 0.0001, momentum=0.9)
+sgd = tf.keras.optimizers.SGD(learning_rate = 0.001, momentum=0.9)
 
 print("Compile model:")
 pretrained_resnet101.compile(
 # model.compile(
-    optimizer = adam,
+    optimizer = sgd,
     loss="binary_crossentropy",
     # loss="categorical_crossentropy",
     # loss="sparse_categorical_crossentropy",
