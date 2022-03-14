@@ -8,7 +8,7 @@ import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras.callbacks import CSVLogger
 from tensorflow.keras.models import Model, Sequential
-from tensorflow.keras.applications.resnet import ResNet101
+from tensorflow.keras.applications.resnet import ResNet101, ResNet50
 # from tensorflow.keras.applications.resnet_v2.ResNet101V2 import ResNet101V2
 from tensorflow.keras.applications.resnet  import preprocess_input, decode_predictions
 # from tensorflow.keras.applications import ResNet101
@@ -70,7 +70,7 @@ validation_img_generator = img_validation_generator.flow_from_directory(
 inputTensor = keras.Input(shape=(IMG_SIZE, IMG_SIZE, 3))
 # inputTensor = Input(shape=(IMG_SIZE, IMG_SIZE, 3))
 
-pretrained_resnet101 = keras.applications.ResNet50(include_top=False, weights='imagenet', input_tensor=inputTensor)
+pretrained_resnet101 = keras.applications.resnet.ResNet101(include_top=False, weights='imagenet', input_tensor=inputTensor)
 
 for layer in pretrained_resnet101.layers:
     layer.trainable = False

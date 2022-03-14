@@ -82,6 +82,8 @@ output = pretrained_resnet101.output
 # output = keras.layers.AveragePooling2D(pool_size=(7,7))(output)
 output = keras.layers.GlobalAveragePooling2D()(output)
 output = keras.layers.Flatten()(output)
+output = keras.layers.Dense(1024, activation='relu')(output)
+output = keras.layers.Dropout(0.25)(output)
 output = keras.layers.Dense(512, activation='relu')(output)
 output = keras.layers.Dropout(0.25)(output)
 output = keras.layers.Dense(1, activation='sigmoid')(output)
@@ -95,12 +97,12 @@ pretrained_resnet101.summary()
 #see: https://pyimagesearch.com/2019/07/22/keras-learning-rate-schedules-and-decay/
 # adam = tf.keras.optimizers.Adam(learning_rate = 0.001, decay = 1e-6)
 adam = tf.keras.optimizers.Adam(learning_rate = 0.0001)
-sgd = tf.keras.optimizers.SGD(learning_rate = 0.0001, momentum=0.9)
+sgd = tf.keras.optimizers.SGD(learning_rate = 0.001, momentum=0.9)
 
 print("Compile model:")
 pretrained_resnet101.compile(
 # model.compile(
-    optimizer = adam,
+    optimizer = sgd,
     loss="binary_crossentropy",
     # loss="categorical_crossentropy",
     # loss="sparse_categorical_crossentropy",
