@@ -8,9 +8,8 @@ import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras.callbacks import CSVLogger
 from tensorflow.keras.models import Model, Sequential
-# from tensorflow.keras.applications.resnet import ResNet101
+#from tensorflow.keras.applications.resnet import ResNet101
 from tensorflow.keras.applications.resnet import ResNet50, ResNet101, ResNet152
-# from tensorflow.keras.applications.resnet_v2.ResNet101V2 import ResNet101V2
 from tensorflow.keras.applications.resnet  import preprocess_input, decode_predictions
 # from tensorflow.keras.applications import ResNet101
 # from tensorflow.keras.applications.resnet import ResNet101
