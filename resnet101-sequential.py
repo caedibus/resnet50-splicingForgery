@@ -8,8 +8,8 @@ import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras.callbacks import CSVLogger
 from tensorflow.keras.models import Model, Sequential
-from tensorflow.keras.applications.resnet import ResNet101, ResNet50
-# from tensorflow.keras.applications.resnet_v2.ResNet101V2 import ResNet101V2
+#from tensorflow.keras.applications.resnet import ResNet101
+from tensorflow.keras.applications.resnet import ResNet50, ResNet101, ResNet152
 from tensorflow.keras.applications.resnet  import preprocess_input, decode_predictions
 # from tensorflow.keras.applications import ResNet101
 # from tensorflow.keras.applications.resnet import ResNet101
@@ -18,6 +18,7 @@ from tensorflow.keras.applications.resnet  import preprocess_input, decode_predi
 from tensorflow.keras.preprocessing import image
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from tensorflow.keras import layers
+from tensorflow.keras.callbacks import EarlyStopping
 from tensorflow.keras import optimizers
 from tensorflow.keras.layers import InputLayer
 
@@ -33,8 +34,8 @@ args = vars(ap.parse_args())
 
 EPOCHS = args["epochs"]
 BATCH_SIZE = args["batchsize"]
-TESTING_SIZE = 0.85
-VALIDATION_SIZE = 0.15
+TESTING_SIZE = 0.8
+VALIDATION_SIZE = 0.2
 IMG_SIZE = 224
 SEED_VALUE = 30
 
@@ -77,12 +78,14 @@ for layer in pretrained_resnet101.layers:
 #Define layers that will be put on top of the freezed Resnet1010 model
 output = pretrained_resnet101.layers[-1].output
 # output = keras.layers.Flatten()(output)
-# output = pretrained_resnet101.layers[-2].output
+output = pretrained_resnet101.layers[-2].output
 output = pretrained_resnet101.output
 # output = keras.layers.AveragePooling2D(pool_size=(7,7))(output)
 output = keras.layers.GlobalAveragePooling2D()(output)
 output = keras.layers.Flatten()(output)
 output = keras.layers.Dense(512, activation='relu')(output)
+output = keras.layers.Dropout(0.25)(output)
+output = keras.layers.Dense(256, activation='relu')(output)
 output = keras.layers.Dropout(0.25)(output)
 output = keras.layers.Dense(1, activation='sigmoid')(output)
 
@@ -114,6 +117,7 @@ csv_logger = CSVLogger(args["csvName"])
 #Inspired by: https://www.geeksforgeeks.org/keras-fit-and-keras-fit_generator/
 #fit_generator is used for big datasets that does not fit in to memory
 print("Training model with Fit function")
+early_stopping = EarlyStopping(monitor='val_loss', mode = 'min', verbose=1, patience=50)
 history = pretrained_resnet101.fit(
     train_img_generator,
     epochs=EPOCHS,
@@ -121,6 +125,7 @@ history = pretrained_resnet101.fit(
     verbose = 1,
     callbacks = [csv_logger],
     validation_data=(validation_img_generator),
+    # callbacks=[early_stopping]
     # validation_steps=2000
 )
 
