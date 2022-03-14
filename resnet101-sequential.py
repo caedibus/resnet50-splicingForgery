@@ -43,7 +43,10 @@ SEED_VALUE = 30
 #Decalre dataset for training split
 train_datagen = ImageDataGenerator(
     preprocessing_function=preprocess_input,
-    validation_split=VALIDATION_SIZE)
+    validation_split=VALIDATION_SIZE,
+    rotation_range=30,
+    height_shift_range=0.2,
+    horizontal_flip=True)
 
 #Don't know if I need further preprocessing here:
 train_img_generator = train_datagen.flow_from_directory(
@@ -56,7 +59,12 @@ train_img_generator = train_datagen.flow_from_directory(
     subset = 'training'
     )
 
-img_validation_generator = ImageDataGenerator(preprocessing_function=preprocess_input, validation_split=VALIDATION_SIZE)
+img_validation_generator = ImageDataGenerator(
+    preprocessing_function=preprocess_input,
+    validation_split=VALIDATION_SIZE,
+    rotation_range=30,
+    height_shift_range=0.2,
+    horizontal_flip=True)
 #Declare dataset for validation split
 validation_img_generator = img_validation_generator.flow_from_directory(
     directory = args["training"],
@@ -88,7 +96,7 @@ output = keras.layers.Dense(512, activation='relu')(output)
 output = keras.layers.Dropout(0.25)(output)
 output = keras.layers.Dense(256, activation='relu')(output)
 output = keras.layers.Dropout(0.25)(output)
-output = keras.layers.Dense(1, activation='sigmoid')(output)
+output = keras.layers.Dense(1, activation='softmax')(output)
 
 pretrained_resnet101 = Model(inputs=pretrained_resnet101.input, outputs = output)
 
