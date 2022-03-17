@@ -42,7 +42,10 @@ SEED_VALUE = 30
 #Decalre dataset for training split
 train_datagen = ImageDataGenerator(
     preprocessing_function=preprocess_input,
-    validation_split=VALIDATION_SIZE)
+    validation_split=VALIDATION_SIZE,
+    rotation_range=30,
+    height_shift_range=0.2,
+    horizontal_flip=True)
 
 #Don't know if I need further preprocessing here:
 train_img_generator = train_datagen.flow_from_directory(
@@ -55,7 +58,10 @@ train_img_generator = train_datagen.flow_from_directory(
     subset = 'training'
     )
 
-img_validation_generator = ImageDataGenerator(preprocessing_function=preprocess_input, validation_split=VALIDATION_SIZE)
+img_validation_generator = ImageDataGenerator(preprocessing_function=preprocess_input, validation_split=VALIDATION_SIZE,
+    rotation_range=30,
+    height_shift_range=0.2,
+    horizontal_flip=True)
 #Declare dataset for validation split
 validation_img_generator = img_validation_generator.flow_from_directory(
     directory = args["training"],
@@ -74,11 +80,11 @@ inputTensor = keras.Input(shape=(IMG_SIZE, IMG_SIZE, 3))
 pretrained_resnet101 = keras.applications.resnet.ResNet101(include_top=False, weights='imagenet', input_tensor=inputTensor)
 
 for layer in pretrained_resnet101.layers:
-    layer.trainable = False
+    layer.trainable = True
 #Define layers that will be put on top of the freezed Resnet1010 model
-output = pretrained_resnet101.layers[-1].output
+#output = pretrained_resnet101.layers[-1].output
 # output = keras.layers.Flatten()(output)
-output = pretrained_resnet101.layers[-2].output
+#output = pretrained_resnet101.layers[-2].output
 output = pretrained_resnet101.output
 # output = keras.layers.AveragePooling2D(pool_size=(7,7))(output)
 output = keras.layers.GlobalAveragePooling2D()(output)
@@ -87,7 +93,9 @@ output = keras.layers.Dense(512, activation='relu')(output)
 output = keras.layers.Dropout(0.25)(output)
 output = keras.layers.Dense(256, activation='relu')(output)
 output = keras.layers.Dropout(0.25)(output)
-output = keras.layers.Dense(1, activation='sigmoid')(output)
+output = keras.layers.Dense(256, activation='relu')(output)
+output = keras.layers.Dropout(0.25)(output)
+output = keras.layers.Dense(1, activation='sigmoid')(output)   #sofmax results in no change of accuracy
 
 pretrained_resnet101 = Model(inputs=pretrained_resnet101.input, outputs = output)
 
@@ -97,7 +105,7 @@ pretrained_resnet101.summary()
 #Decay is used for smaller learning steps duing the last epochs
 #see: https://pyimagesearch.com/2019/07/22/keras-learning-rate-schedules-and-decay/
 # adam = tf.keras.optimizers.Adam(learning_rate = 0.001, decay = 1e-6)
-adam = tf.keras.optimizers.Adam(learning_rate = 0.0001)
+adam = tf.keras.optimizers.Adam(learning_rate = 0.001)
 sgd = tf.keras.optimizers.SGD(learning_rate = 0.0001, momentum=0.9)
 
 print("Compile model:")
