@@ -90,23 +90,23 @@ inputTensor = keras.Input(shape=(IMG_SIZE, IMG_SIZE, 3))
 pretrained_resnet101 = keras.applications.resnet.ResNet101(include_top=False, weights='imagenet', input_tensor=inputTensor)
 
 for layer in pretrained_resnet101.layers:
-    layer.trainable = True
+    layer.trainable = False
 #Define layers that will be put on top of the freezed Resnet1010 model
-#output = pretrained_resnet101.layers[-1].output
+output = pretrained_resnet101.layers[-1].output
 # output = keras.layers.Flatten()(output)
 #output = pretrained_resnet101.layers[-2].output
 output = pretrained_resnet101.output
 # output = keras.layers.AveragePooling2D(pool_size=(7,7))(output)
 output = keras.layers.GlobalAveragePooling2D()(output)
 output = keras.layers.Flatten()(output)
-# output = keras.layers.Dense(512, activation='relu')(output)
-# output = keras.layers.Dropout(0.25)(output)
-output = keras.layers.Dense(512)(output)
+output = keras.layers.Dense(512, activation='relu')(output)
 output = keras.layers.Dropout(0.25)(output)
-output = keras.layers.Dense(256)(output)
-output = keras.layers.Dropout(0.25)(output)
+#output = keras.layers.Dense(512)(output)
+#output = keras.layers.Dropout(0.25)(output)
+#output = keras.layers.Dense(256)(output)
+#output = keras.layers.Dropout(0.25)(output)
 output = keras.layers.Dense(256, activation='relu')(output)
-output = keras.layers.Dropout(0.25)(output)
+output = keras.layers.Dropout(0.35)(output)
 output = keras.layers.Dense(1, activation='sigmoid')(output)   #sofmax results in no change of accuracy
 
 pretrained_resnet101 = Model(inputs=pretrained_resnet101.input, outputs = output)
@@ -118,8 +118,8 @@ pretrained_resnet101.summary()
 #see: https://pyimagesearch.com/2019/07/22/keras-learning-rate-schedules-and-decay/
 # adam = tf.keras.optimizers.Adam(learning_rate = 0.001, decay = 1e-6)
 epochNumb = args["epochs"]
-adam = tf.keras.optimizers.Adam(learning_rate = 0.0001, decay=0.0001/epochNumb)
-sgd = tf.keras.optimizers.SGD(learning_rate = 0.0001, momentum=0.9)
+adam = tf.keras.optimizers.Adam(learning_rate = 0.001)
+sgd = tf.keras.optimizers.SGD(learning_rate = 0.001, decay = 0.001)
 
 #Define learning decay after n iterations
 def decay_LRscheduler(epoch, lr):
@@ -130,7 +130,7 @@ learningRate = LearningRateScheduler(decay_LRscheduler)
 
 print("Compile model:")
 pretrained_resnet101.compile(
-    optimizer = adam,
+    optimizer = sgd,
     loss="binary_crossentropy",
     # loss="categorical_crossentropy",
     # loss="sparse_categorical_crossentropy",
