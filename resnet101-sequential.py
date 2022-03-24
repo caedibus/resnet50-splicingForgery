@@ -209,7 +209,7 @@ plt.legend(['Train_acc','Val_acc', 'loss','Val_loss', 'Precision','Val_precision
 plt.savefig("recall.pdf")
 
 
-pretrained_resnet101.save(args["saveModel"])
+pretrained_resnet101.save(args["saveModel"], save_format="h5")
 
 #https://medium.com/@nsaeedster/compute-performance-metrics-f1-score-precision-accuracy-for-cnn-in-fastai-959d86b6f8ad
 # See for calling images that have been wronly predicted
