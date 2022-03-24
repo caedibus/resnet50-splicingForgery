@@ -94,9 +94,9 @@ inputTensor = keras.Input(shape=(IMG_SIZE, IMG_SIZE, 3))
 pretrained_resnet101 = keras.applications.resnet.ResNet101(include_top=False, weights='imagenet', input_tensor=inputTensor)
 
 for layer in pretrained_resnet101.layers:
-    layer.trainable = True
+    layer.trainable = False
 #Define layers that will be put on top of the freezed Resnet1010 model
-#output = pretrained_resnet101.layers[-1].output
+output = pretrained_resnet101.layers[-1].output
 # output = keras.layers.Flatten()(output)
 #output = pretrained_resnet101.layers[-2].output
 output = pretrained_resnet101.output
