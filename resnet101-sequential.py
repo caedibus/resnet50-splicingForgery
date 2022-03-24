@@ -31,6 +31,8 @@ ap.add_argument("-t","--training", required=True, help="Path to training directo
 ap.add_argument("-e", "--epochs", type =int, default = 20, help ="Number of epochs for training")
 ap.add_argument("-b", "--batchsize", type=int, default =32, help = "Number of batch size")
 ap.add_argument("-fn", "--csvName", default='saved-output.csv', help ="Filename of csv output")
+ap.add_argument("-sm", "--saveModel", default='save_model', help ="saved model output")
+
 # ap.add_argument("-v","--validation", required=True, help="Path to validation directory")
 args = vars(ap.parse_args())
 
@@ -48,6 +50,7 @@ train_datagen = ImageDataGenerator(
     validation_split=VALIDATION_SIZE,
     rotation_range=30,
     height_shift_range=0.2,
+    vertical_flip = True,
     horizontal_flip=True
 )
 
@@ -68,6 +71,7 @@ img_validation_generator = ImageDataGenerator(
     validation_split=VALIDATION_SIZE,
     rotation_range=30,
     height_shift_range=0.2,
+    vertical_flip = True,
     horizontal_flip=True
 )
 
@@ -101,12 +105,12 @@ output = keras.layers.GlobalAveragePooling2D()(output)
 output = keras.layers.Flatten()(output)
 output = keras.layers.Dense(512, activation='relu')(output)
 output = keras.layers.Dropout(0.25)(output)
-#output = keras.layers.Dense(512)(output)
-#output = keras.layers.Dropout(0.25)(output)
-#output = keras.layers.Dense(256)(output)
-#output = keras.layers.Dropout(0.25)(output)
+# output = keras.layers.Dense(512)(output)
+# output = keras.layers.Dropout(0.25)(output)
+output = keras.layers.Dense(256)(output)
+output = keras.layers.Dropout(0.25)(output)
 output = keras.layers.Dense(256, activation='relu')(output)
-output = keras.layers.Dropout(0.35)(output)
+output = keras.layers.Dropout(0.25)(output)
 output = keras.layers.Dense(1, activation='sigmoid')(output)   #sofmax results in no change of accuracy
 
 pretrained_resnet101 = Model(inputs=pretrained_resnet101.input, outputs = output)
@@ -118,8 +122,9 @@ pretrained_resnet101.summary()
 #see: https://pyimagesearch.com/2019/07/22/keras-learning-rate-schedules-and-decay/
 # adam = tf.keras.optimizers.Adam(learning_rate = 0.001, decay = 1e-6)
 epochNumb = args["epochs"]
+# adam = tf.keras.optimizers.Adam(learning_rate = 0.001, decay=0.001/epochNum)
 adam = tf.keras.optimizers.Adam(learning_rate = 0.001)
-sgd = tf.keras.optimizers.SGD(learning_rate = 0.001, decay = 0.001)
+sgd = tf.keras.optimizers.SGD(learning_rate = 0.001, decay = 0.00001)
 
 #Define learning decay after n iterations
 def decay_LRscheduler(epoch, lr):
@@ -202,3 +207,12 @@ plt.title('Training and validation recall')
 plt.legend(['Train_acc','Val_acc', 'loss','Val_loss', 'Precision','Val_precision', 'Recall','Val_recall']) #Train Loss
 # plt.show()
 plt.savefig("recall.pdf")
+
+
+pretrained_resnet101.save(args["saveModel"])
+
+#https://medium.com/@nsaeedster/compute-performance-metrics-f1-score-precision-accuracy-for-cnn-in-fastai-959d86b6f8ad
+# See for calling images that have been wronly predicted
+
+
+#--------------------- DISPLAY WRONGLY PREDICTED IMAGES ------------------------
