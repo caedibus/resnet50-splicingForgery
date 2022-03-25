@@ -94,14 +94,15 @@ inputTensor = keras.Input(shape=(IMG_SIZE, IMG_SIZE, 3))
 pretrained_resnet101 = keras.applications.resnet.ResNet101(include_top=False, weights='imagenet', input_tensor=inputTensor)
 
 for layer in pretrained_resnet101.layers:
-    layer.trainable = False
+    layer.trainable = True
 #Define layers that will be put on top of the freezed Resnet1010 model
-output = pretrained_resnet101.layers[-1].output
+#output = pretrained_resnet101.layers[-1].output
 # output = keras.layers.Flatten()(output)
 #output = pretrained_resnet101.layers[-2].output
 output = pretrained_resnet101.output
 # output = keras.layers.AveragePooling2D(pool_size=(7,7))(output)
-output = keras.layers.GlobalAveragePooling2D()(output)
+# output = keras.layers.GlobalAveragePooling2D()(output)
+output = keras.layers.MaxPooling2D(pool_size = (5,5))(output)
 output = keras.layers.Flatten()(output)
 output = keras.layers.Dense(512, activation='relu')(output)
 output = keras.layers.Dropout(0.25)(output)
@@ -209,7 +210,7 @@ plt.legend(['Train_acc','Val_acc', 'loss','Val_loss', 'Precision','Val_precision
 plt.savefig("recall.pdf")
 
 
-pretrained_resnet101.save(args["saveModel"], save_format="h5")
+# pretrained_resnet101.save(args["saveModel"], save_format="h5")
 
 #https://medium.com/@nsaeedster/compute-performance-metrics-f1-score-precision-accuracy-for-cnn-in-fastai-959d86b6f8ad
 # See for calling images that have been wronly predicted

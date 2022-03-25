@@ -48,6 +48,8 @@ validation_img_generator = img_validation_generator.flow_from_directory(
 
 model = keras.models.load_model(LOADED_MODEL)
 
+model.summary()
+
 model.fit(
     validation_img_generator,
     epochs=EPOCHS,
