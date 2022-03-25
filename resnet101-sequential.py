@@ -31,7 +31,7 @@ ap.add_argument("-t","--training", required=True, help="Path to training directo
 ap.add_argument("-e", "--epochs", type =int, default = 20, help ="Number of epochs for training")
 ap.add_argument("-b", "--batchsize", type=int, default =32, help = "Number of batch size")
 ap.add_argument("-fn", "--csvName", default='saved-output.csv', help ="Filename of csv output")
-ap.add_argument("-sm", "--saveModel", default='save_model', help ="saved model output")
+ap.add_argument("-sm", "--saveModel", default='/save_model', help ="saved model output")
 
 # ap.add_argument("-v","--validation", required=True, help="Path to validation directory")
 args = vars(ap.parse_args())
@@ -124,7 +124,7 @@ pretrained_resnet101.summary()
 epochNumb = args["epochs"]
 # adam = tf.keras.optimizers.Adam(learning_rate = 0.001, decay=0.001/epochNum)
 adam = tf.keras.optimizers.Adam(learning_rate = 0.001)
-sgd = tf.keras.optimizers.SGD(learning_rate = 0.001, decay = 0.00001)
+sgd = tf.keras.optimizers.SGD(learning_rate = 0.001, decay = 0.0001)
 
 #Define learning decay after n iterations
 def decay_LRscheduler(epoch, lr):
@@ -209,7 +209,7 @@ plt.legend(['Train_acc','Val_acc', 'loss','Val_loss', 'Precision','Val_precision
 plt.savefig("recall.pdf")
 
 
-pretrained_resnet101.save(args["saveModel"], save_format="h5")
+pretrained_resnet101.save(args["saveModel"]) #, save_format="h5")
 
 #https://medium.com/@nsaeedster/compute-performance-metrics-f1-score-precision-accuracy-for-cnn-in-fastai-959d86b6f8ad
 # See for calling images that have been wronly predicted

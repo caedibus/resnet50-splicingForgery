@@ -20,8 +20,21 @@ from tensorflow.keras.metrics import Precision, Recall
 
 from tensorflow.keras.models import load_model
 
+
+ap = argparse.ArgumentParser()
+ap.add_argument("-t","--training", required=True, help="Path to training directory")
+ap.add_argument("-e", "--epochs", type =int, default = 20, help ="Number of epochs for training")
+ap.add_argument("-b", "--batchsize", type=int, default =32, help = "Number of batch size")
+ap.add_argument("-fn", "--csvName", default='saved-output.csv', help ="Filename of csv output")
+args = vars(ap.parse_args())
+
 VALIDATION_SIZE = 0.2
-LOADED_MODEL = r'C:\Users\Malene\OneDrive - NTNU\Documents\NTNU\MasterThesis-2022\Code-testing\resnet50-splicingForgery\save_model'
+LOADED_MODEL = '/home/malenev/resnet50-splicingForgery/save_model2'
+IMG_SIZE = 224
+VALIDATION_SIZE = 0.1
+SEED_VALUE = 1
+EPOCHS = args["epochs"]
+BATCH_SIZE = args["batchsize"]
 
 
 img_validation_generator = ImageDataGenerator(
@@ -48,6 +61,9 @@ validation_img_generator = img_validation_generator.flow_from_directory(
 
 model = keras.models.load_model(LOADED_MODEL)
 
+model.summary()
+
+csv_logger = CSVLogger(args["csvName"])
 model.fit(
     validation_img_generator,
     epochs=EPOCHS,
