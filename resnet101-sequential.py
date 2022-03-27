@@ -94,22 +94,22 @@ inputTensor = keras.Input(shape=(IMG_SIZE, IMG_SIZE, 3))
 pretrained_resnet101 = keras.applications.resnet.ResNet101(include_top=False, weights='imagenet', input_tensor=inputTensor)
 
 for layer in pretrained_resnet101.layers:
-    layer.trainable = False
+    layer.trainable = True
 #Define layers that will be put on top of the freezed Resnet1010 model
-output = pretrained_resnet101.layers[-1].output
+#output = pretrained_resnet101.layers[-1].output
 # output = keras.layers.Flatten()(output)
 #output = pretrained_resnet101.layers[-2].output
 output = pretrained_resnet101.output
-# output = keras.layers.AveragePooling2D(pool_size=(7,7))(output)
-#output = keras.layers.GlobalAveragePooling2D()(output)
-output = keras.layers.MaxPooling2D(pool_size = (2,2))(output)
+# output = keras.layers.AveragePooling2D(pool_size=(2,2))(output)
+output = keras.layers.GlobalAveragePooling2D()(output)
+# output = keras.layers.MaxPooling2D(pool_size = (4,4))(output)
 output = keras.layers.Flatten()(output)
 output = keras.layers.Dense(512, activation='relu')(output)
 output = keras.layers.Dropout(0.25)(output)
 # output = keras.layers.Dense(512)(output)
 # output = keras.layers.Dropout(0.25)(output)
-output = keras.layers.Dense(256)(output)
-output = keras.layers.Dropout(0.25)(output)
+# output = keras.layers.Dense(256, activation='relu')(output)
+# output = keras.layers.Dropout(0.25)(output)
 output = keras.layers.Dense(256, activation='relu')(output)
 output = keras.layers.Dropout(0.25)(output)
 output = keras.layers.Dense(1, activation='sigmoid')(output)   #sofmax results in no change of accuracy
@@ -125,7 +125,7 @@ pretrained_resnet101.summary()
 epochNumb = args["epochs"]
 # adam = tf.keras.optimizers.Adam(learning_rate = 0.001, decay=0.001/epochNum)
 adam = tf.keras.optimizers.Adam(learning_rate = 0.001)
-sgd = tf.keras.optimizers.SGD(learning_rate = 0.001, decay = 0.0001)
+sgd = tf.keras.optimizers.SGD(learning_rate = 0.001, decay = 0.00001)
 
 #Define learning decay after n iterations
 def decay_LRscheduler(epoch, lr):
@@ -183,7 +183,7 @@ plt.plot(epochs, acc)
 plt.plot(epochs, val_acc)
 plt.title('Training and validation accuracy')
 plt.legend(['Train_acc','Val_acc'])
-plt.savefig("acc.pdf")
+# plt.savefig("acc.pdf")
 plt.figure() #Train accuracy
 
 plt.plot(epochs, loss)
@@ -193,24 +193,25 @@ plt.title('Training and validation loss')
 plt.legend(['loss','Val_loss']) #Train Loss
 
 # plt.show()
-plt.savefig("loss.pdf")
+# plt.savefig("loss.pdf")
 
 plt.plot(epochs, precision)
 plt.plot(epochs, val_precision)
 plt.title('Training and validation precision')
 plt.legend(['Precision','Val_precision']) #Train Loss
 # plt.show()
-plt.savefig("precision.pdf")
+# plt.savefig("precision.pdf")
 
 plt.plot(epochs, recall)
 plt.plot(epochs, val_recall)
 plt.title('Training and validation recall')
 plt.legend(['Train_acc','Val_acc', 'loss','Val_loss', 'Precision','Val_precision', 'Recall','Val_recall']) #Train Loss
 # plt.show()
-plt.savefig("recall.pdf")
+# plt.savefig("recall.pdf")
 
 
 pretrained_resnet101.save(args["saveModel"]) #, save_format="h5")
+# pretrained_resnet101.save_weights(args["saveModel"]) #Saving weights from model performance
 
 #https://medium.com/@nsaeedster/compute-performance-metrics-f1-score-precision-accuracy-for-cnn-in-fastai-959d86b6f8ad
 # See for calling images that have been wronly predicted
