@@ -101,7 +101,8 @@ output = pretrained_resnet101.layers[-1].output
 #output = pretrained_resnet101.layers[-2].output
 output = pretrained_resnet101.output
 # output = keras.layers.AveragePooling2D(pool_size=(7,7))(output)
-output = keras.layers.GlobalAveragePooling2D()(output)
+#output = keras.layers.GlobalAveragePooling2D()(output)
+output = keras.layers.MaxPooling2D(pool_size = (2,2))(output)
 output = keras.layers.Flatten()(output)
 output = keras.layers.Dense(512, activation='relu')(output)
 output = keras.layers.Dropout(0.25)(output)
