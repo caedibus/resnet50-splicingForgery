@@ -19,11 +19,12 @@ from tensorflow.keras.applications.resnet  import preprocess_input, decode_predi
 
 from tensorflow.keras.preprocessing import image
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
-from tensorflow.keras import layers
+from tensorflow.keras import layers, regularizers
 from tensorflow.keras.callbacks import EarlyStopping
 from tensorflow.keras import optimizers
 from tensorflow.keras.layers import InputLayer
 from tensorflow.keras.metrics import Precision, Recall
+
 
 
 ap = argparse.ArgumentParser()
@@ -104,19 +105,19 @@ output = pretrained_resnet101.output
 output = keras.layers.GlobalAveragePooling2D()(output)
 # output = keras.layers.MaxPooling2D(pool_size = (4,4))(output)
 output = keras.layers.Flatten()(output)
-#output = keras.layers.Dense(512, activation='relu')(output)
-#output = keras.layers.Dropout(0.25)(output)
-output = keras.layers.Dense(512)(output)
+output = keras.layers.Dense(512, activation='relu', kernel_regularizer=regularizers.l2(0.001))(output)
 output = keras.layers.Dropout(0.25)(output)
-# output = keras.layers.Dense(256, activation='relu')(output)
+# output = keras.layers.Dense(512)(output)
 # output = keras.layers.Dropout(0.25)(output)
-output = keras.layers.Dense(256, activation='relu')(output)
+# output = keras.layers.Dense(256, activation='relu', kernel_regularizer=regularizers.l2(0.001))(output)
+# output = keras.layers.Dropout(0.25)(output)
+output = keras.layers.Dense(256, activation='relu', kernel_regularizer=regularizers.l2(0.001))(output)
 output = keras.layers.Dropout(0.25)(output)
 output = keras.layers.Dense(1, activation='sigmoid')(output)   #sofmax results in no change of accuracy
 
 pretrained_resnet101 = Model(inputs=pretrained_resnet101.input, outputs = output)
 
-pretrained_resnet101.summary()
+# pretrained_resnet101.summary()
 
 #Define optimizer function
 #Decay is used for smaller learning steps duing the last epochs
@@ -125,7 +126,7 @@ pretrained_resnet101.summary()
 epochNumb = args["epochs"]
 # adam = tf.keras.optimizers.Adam(learning_rate = 0.001, decay=0.001/epochNum)
 adam = tf.keras.optimizers.Adam(learning_rate = 0.001)
-sgd = tf.keras.optimizers.SGD(learning_rate = 0.001, decay = 0.00001)
+sgd = tf.keras.optimizers.SGD(learning_rate = 0.001)#, decay = 0.0001)
 
 #Define learning decay after n iterations
 def decay_LRscheduler(epoch, lr):
@@ -162,6 +163,7 @@ history = pretrained_resnet101.fit(
     validation_data=(validation_img_generator),
     # callbacks=[early_stopping]
     # validation_steps=2000
+    # steps_per_epoch=TESTING_SIZE/BATCH_SIZE
 )
 
 # pretrained_resnet101.summary()

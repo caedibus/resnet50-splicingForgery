@@ -33,7 +33,7 @@ args = vars(ap.parse_args())
 # VALIDATION_SIZE = 0.2
 LOADED_MODEL = r'C:\Users\Malene\OneDrive - NTNU\Documents\NTNU\MasterThesis-2022\Code-testing\resnet50-splicingForgery\save_model'
 IMG_SIZE = 224
-VALIDATION_SIZE = 0.99
+VALIDATION_SIZE = 0.1
 SEED_VALUE = 1
 EPOCHS = args["epochs"]
 BATCH_SIZE = args["batchsize"]
@@ -56,8 +56,8 @@ def compare_labels(img, true_label, predicted_label):
             print("Labels are different")
             tmp_img = copy.copy(img[i])
             tmp_img2 = undo_preprocessing(tmp_img)
-            plt.imshow(tmp_img2.astype('uint8'))
-            plt.show()
+            # plt.imshow(tmp_img2.astype('uint8'))
+            # plt.show()
 
 def undo_preprocessing(x):
     mean = [103.939, 116.779, 123.68]
