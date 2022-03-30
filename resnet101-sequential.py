@@ -101,12 +101,14 @@ for layer in pretrained_resnet101.layers:
 # output = keras.layers.Flatten()(output)
 #output = pretrained_resnet101.layers[-2].output
 output = pretrained_resnet101.output
+output = keras.layers.Conv2D(64,(3,3), activation='relu')(output)
 # output = keras.layers.AveragePooling2D(pool_size=(2,2))(output)
 output = keras.layers.GlobalAveragePooling2D()(output)
-# output = keras.layers.MaxPooling2D(pool_size = (4,4))(output)
+#output = keras.layers.MaxPooling2D(2, 2)(output)
 output = keras.layers.Flatten()(output)
-output = keras.layers.Dense(512, activation='relu', kernel_regularizer=regularizers.l2(0.001))(output)
-output = keras.layers.Dropout(0.25)(output)
+output = keras.layers.Conv2D(64,(3,3), activation='relu')(output)
+output = keras.layers.Dense(512, activation='relu')(output)
+output = keras.layers.Dropout(0.15)(output)
 # output = keras.layers.Dense(512)(output)
 # output = keras.layers.Dropout(0.25)(output)
 # output = keras.layers.Dense(256, activation='relu', kernel_regularizer=regularizers.l2(0.001))(output)
