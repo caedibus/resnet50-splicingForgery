@@ -103,18 +103,21 @@ for layer in pretrained_resnet101.layers:
 output = pretrained_resnet101.output
 output = keras.layers.Conv2D(64,(3,3), activation='relu')(output)
 # output = keras.layers.AveragePooling2D(pool_size=(2,2))(output)
-output = keras.layers.GlobalAveragePooling2D()(output)
-#output = keras.layers.MaxPooling2D(2, 2)(output)
-output = keras.layers.Flatten()(output)
 output = keras.layers.Conv2D(64,(3,3), activation='relu')(output)
+# output = keras.layers.GlobalAveragePooling2D()(output)
+output = keras.layers.MaxPooling2D(pool_size = (3,3), strides=(2,2))(output)
+output = keras.layers.Flatten()(output)
+# TODO: test different regularizers
 output = keras.layers.Dense(512, activation='relu')(output)
-output = keras.layers.Dropout(0.15)(output)
+output = keras.layers.Dropout(0.25)(output)
+# TODO: test out different Dropout
 # output = keras.layers.Dense(512)(output)
 # output = keras.layers.Dropout(0.25)(output)
 # output = keras.layers.Dense(256, activation='relu', kernel_regularizer=regularizers.l2(0.001))(output)
 # output = keras.layers.Dropout(0.25)(output)
-output = keras.layers.Dense(256, activation='relu', kernel_regularizer=regularizers.l2(0.001))(output)
-output = keras.layers.Dropout(0.25)(output)
+output = keras.layers.Dense(256, activation='relu')(output)
+output = keras.layers.Dropout(0.15)(output)
+# TODO: test out different Dropout
 output = keras.layers.Dense(1, activation='sigmoid')(output)   #sofmax results in no change of accuracy
 
 pretrained_resnet101 = Model(inputs=pretrained_resnet101.input, outputs = output)
@@ -154,14 +157,14 @@ csv_logger = CSVLogger(args["csvName"])
 #fit_generator is used for big datasets that does not fit in to memory
 print("Training model with Fit function")
 #Define early stopping condition
-early_stopping = EarlyStopping(monitor='val_loss', mode = 'min', verbose=1, patience=50)
+early_stopping = EarlyStopping(monitor='val_loss', mode = 'min', verbose=1, patience=200)
 
 history = pretrained_resnet101.fit(
     train_img_generator,
     epochs=EPOCHS,
     batch_size=BATCH_SIZE,
     verbose = 1,
-    callbacks = [csv_logger],
+    callbacks = [csv_logger, early_stopping],
     validation_data=(validation_img_generator),
     # callbacks=[early_stopping]
     # validation_steps=2000
