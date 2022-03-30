@@ -40,6 +40,7 @@ BATCH_SIZE = args["batchsize"]
 
 
 ## FUNCTIONS
+#https://thedatafrog.com/en/articles/image-recognition-transfer-learning/
 #Function returns labels of the predicted images
 def predicted_label(pred, threshold):
     label = np.arange(len(pred))
@@ -59,43 +60,17 @@ def compare_labels(img, true_label, predicted_label):
             # plt.imshow(tmp_img2.astype('uint8'))
             # plt.show()
 
+#https://stackoverflow.com/questions/49643907/clipping-input-data-to-the-valid-range-for-imshow-with-rgb-data-0-1-for-floa
 def undo_preprocessing(x):
     mean = [103.939, 116.779, 123.68]
     x[..., 0] += mean[0]
     x[..., 1] += mean[1]
     x[..., 2] += mean[2]
     x = x[..., ::-1]
-    # x = np.clip(x, 0, 255).astype('int')
     return x
-# def restore_original_image_from_array(x, data_format='channels_first'):
-    # mean = [103.939, 116.779, 123.68]
-    #
-    # # Zero-center by mean pixel
-    # if data_format == 'channels_first':
-    #     if x.ndim == 3:
-    #         x[0, :, :] += mean[0]
-    #         x[1, :, :] += mean[1]
-    #         x[2, :, :] += mean[2]
-    #     else:
-    #         x[:, 0, :, :] += mean[0]
-    #         x[:, 1, :, :] += mean[1]
-    #         x[:, 2, :, :] += mean[2]
-    # else:
-    #     x[..., 0] += mean[0]
-    #     x[..., 1] += mean[1]
-    #     x[..., 2] += mean[2]
-    #
-    # if data_format == 'channels_first':
-    #     # 'BGR'->'RGB'
-    #     if x.ndim == 3:
-    #         x = x[::-1, ...]
-    #     else:
-    #         x = x[:, ::-1, ...]
-    # else:
-    #     # 'BGR'->'RGB'
-    #     x = x[..., ::-1]
-    #
-    # return x
+
+# TODO: Implement confusion matrix
+#def confusionMatrix():
 
 img_validation_generator = ImageDataGenerator(
     preprocessing_function=preprocess_input,
@@ -115,7 +90,6 @@ validation_img_generator = img_validation_generator.flow_from_directory(
     class_mode = 'binary',
     seed = SEED_VALUE,
     shuffle=False,
-    # color_mode = 'rgb',
     subset = 'validation'
     )
 
