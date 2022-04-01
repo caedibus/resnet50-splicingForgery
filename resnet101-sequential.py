@@ -101,6 +101,7 @@ for layer in pretrained_resnet101.layers:
 # output = keras.layers.Flatten()(output)
 #output = pretrained_resnet101.layers[-2].output
 output = pretrained_resnet101.output
+output = keras.layers.Conv2D(64,(3,3), activation='relu')(output)
 # output = keras.layers.AveragePooling2D(pool_size=(2,2))(output)
 output = keras.layers.Conv2D(64, (3,3), activation = 'relu')(output)
 # output = keras.layers.Conv2D(32, (3,3), activation = 'relu')(output)
