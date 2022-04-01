@@ -123,11 +123,6 @@ output = keras.layers.Dense(256, activation='relu', kernel_regularizer=regulariz
 output = keras.layers.Dropout(0.25)(output)
 output = keras.layers.BatchNormalization()(output)
 
-# TODO: test out different Dropout
-output = keras.layers.Dense(1, activation='sigmoid')(output)   #sofmax results in no change of accuracy
-
-pretrained_resnet101 = Model(inputs=pretrained_resnet101.input, outputs = output)
-
 # pretrained_resnet101.summary()
 
 #Define optimizer function
