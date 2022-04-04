@@ -20,6 +20,7 @@ from tensorflow.keras.applications.resnet  import preprocess_input, decode_predi
 from tensorflow.keras.preprocessing import image
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from tensorflow.keras import layers, regularizers
+from tensorflow.keras.regularizers import l2
 from tensorflow.keras.callbacks import EarlyStopping
 from tensorflow.keras import optimizers
 from tensorflow.keras.layers import InputLayer
@@ -32,7 +33,7 @@ ap.add_argument("-t","--training", required=True, help="Path to training directo
 ap.add_argument("-e", "--epochs", type =int, default = 20, help ="Number of epochs for training")
 ap.add_argument("-b", "--batchsize", type=int, default =32, help = "Number of batch size")
 ap.add_argument("-fn", "--csvName", default='saved-output.csv', help ="Filename of csv output")
-ap.add_argument("-sm", "--saveModel", default='/save_model', help ="saved model output")
+ap.add_argument("-sm", "--saveModel", default='./save_model', help ="saved model output")
 
 # ap.add_argument("-v","--validation", required=True, help="Path to validation directory")
 args = vars(ap.parse_args())
@@ -113,7 +114,7 @@ output = keras.layers.GlobalAveragePooling2D()(output)
 output = keras.layers.Flatten()(output)
 # TODO: test different regularizers
 
-output = keras.layers.Dense(512, activation='relu',  kernel_regularizer=regularizers.l2(0.003))(output)
+output = keras.layers.Dense(512, activation='relu',  kernel_regularizer=regularizers.l2(0.004))(output)
 output = keras.layers.Dropout(0.25)(output)
 # output = keras.layers.BatchNormalization()(output)
 
@@ -141,7 +142,7 @@ pretrained_resnet101 = Model(inputs=pretrained_resnet101.input, outputs = output
 epochNumb = args["epochs"]
 # adam = tf.keras.optimizers.Adam(learning_rate = 0.001, decay=0.001/epochNum)
 adam = tf.keras.optimizers.Adam(learning_rate = 0.001)
-sgd = tf.keras.optimizers.SGD(learning_rate = 0.001)#, decay = 0.0001)
+sgd = tf.keras.optimizers.SGD(learning_rate = 0.001)#0, decay = 0.0001)
 
 #Define learning decay after n iterations
 def decay_LRscheduler(epoch, lr):
