@@ -126,6 +126,8 @@ output = keras.layers.Dropout(0.25)(output)
 
 output = keras.layers.Dense(256, activation='relu', kernel_regularizer=regularizers.l2(0.003))(output)
 output = keras.layers.Dropout(0.25)(output)
+# output = keras.layers.Dense(128, activation='relu')(output)
+# output = keras.layers.Dropout(0.25)(output)
 # output = keras.layers.BatchNormalization()(output)
 # TODO: test out different Dropout
 output = keras.layers.Dense(1, activation='sigmoid')(output)   #sofmax results in no change of accuracy
