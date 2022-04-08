@@ -1,8 +1,9 @@
 import numpy as np
 import matplotlib.pyplot as plt
-# import os
+import os
 # import cv2
 import argparse
+from imutils import paths
 import tensorflow as tf
 import tensorflow_addons as tfa
 
@@ -29,27 +30,30 @@ from tensorflow.keras.metrics import Precision, Recall
 
 
 ap = argparse.ArgumentParser()
-ap.add_argument("-t","--training", required=True, help="Path to training directory")
+ap.add_argument("-t","--training", default=r'C:\Users\Malene\OneDrive - NTNU\Documents\NTNU\MasterThesis-2022\Code-testing\CASIA2-trainValTest\train', help="Path to training directory")
 ap.add_argument("-e", "--epochs", type =int, default = 20, help ="Number of epochs for training")
 ap.add_argument("-b", "--batchsize", type=int, default =32, help = "Number of batch size")
 ap.add_argument("-fn", "--csvName", default='saved-output.csv', help ="Filename of csv output")
 ap.add_argument("-sm", "--saveModel", default='./save_model', help ="saved model output")
+ap.add_argument("-v","--validation", default = r'C:\Users\Malene\OneDrive - NTNU\Documents\NTNU\MasterThesis-2022\Code-testing\CASIA2-trainValTest\validation', help="Path to validation directory")
+ap.add_argument("-test","--testDirectory", default = r'C:\Users\Malene\OneDrive - NTNU\Documents\NTNU\MasterThesis-2022\Code-testing\CASIA2-trainValTest\test', help="Path to testing directory")
 
-# ap.add_argument("-v","--validation", required=True, help="Path to validation directory")
 args = vars(ap.parse_args())
 
 
 EPOCHS = args["epochs"]
 BATCH_SIZE = args["batchsize"]
-TESTING_SIZE = 0.8
-VALIDATION_SIZE = 0.2
+TESTING_SIZE = 0.75
+VALIDATION_SIZE = 0.1
 IMG_SIZE = 224
 SEED_VALUE = 30
+lenValidation = len(list(paths.list_images(args["validation"])))
+print("lenValidation ", lenValidation)
 
 #Decalre dataset for training split
 train_datagen = ImageDataGenerator(
     preprocessing_function=preprocess_input,
-    validation_split=VALIDATION_SIZE,
+    # validation_split=VALIDATION_SIZE,
     rotation_range=30,
     height_shift_range=0.2,
     vertical_flip = True,
@@ -65,12 +69,12 @@ train_img_generator = train_datagen.flow_from_directory(
     seed = SEED_VALUE,
     shuffle=False,
     # color_mode = 'rgb',
-    subset = 'training'
+    # subset = 'training'
     )
 
 img_validation_generator = ImageDataGenerator(
     preprocessing_function=preprocess_input,
-    validation_split=VALIDATION_SIZE,
+    # validation_split=VALIDATION_SIZE,
     rotation_range=30,
     height_shift_range=0.2,
     vertical_flip = True,
@@ -79,94 +83,69 @@ img_validation_generator = ImageDataGenerator(
 
 #Declare dataset for validation split
 validation_img_generator = img_validation_generator.flow_from_directory(
-    directory = args["training"],
+    directory = args["validation"],
     target_size = (IMG_SIZE,IMG_SIZE),
     batch_size = 10,
     # batch_size = BATCH_SIZE,
     class_mode = 'binary',
     seed = SEED_VALUE,
     shuffle=False,
-    # color_mode = 'rgb',
-    subset = 'validation'
+    # subset = 'validation',
     )
 
+testing_generator = img_validation_generator.flow_from_directory(
+    directory = args["testDirectory"],
+    target_size=(IMG_SIZE,IMG_SIZE),
+    batch_size = BATCH_SIZE,
+    class_mode = 'binary',
+    seed = SEED_VALUE,
+    shuffle=False,
+)
+
 inputTensor = keras.Input(shape=(IMG_SIZE, IMG_SIZE, 3))
-# inputTensor = Input(shape=(IMG_SIZE, IMG_SIZE, 3))
 
 pretrained_resnet101 = keras.applications.resnet.ResNet101(include_top=False, weights='imagenet', input_tensor=inputTensor)
 
 for layer in pretrained_resnet101.layers:
     layer.trainable = False
-#Define layers that will be put on top of the freezed Resnet1010 model
-#output = pretrained_resnet101.layers[-1].output
-# output = keras.layers.Flatten()(output)
-#output = pretrained_resnet101.layers[-2].output
+
 output = pretrained_resnet101.output
-#output = keras.layers.Conv2D(64, (3,3), activation = 'relu')(output)
-# output = keras.layers.Conv2D(64, (3,3), activation = 'relu')(output)
-#output = keras.layers.BatchNormalization()(output)
-# output = keras.layers.AveragePooling2D(pool_size=(2,2))(output)
-# output = keras.layers.MaxPooling2D(pool_size=(3,3), strides=(2,2))(output)
-# output = keras.layers.Conv2D(64, (3,3), activation = 'relu')(output)
-# output = keras.layers.Conv2D(32, (3,3), activation = 'relu')(output)
-# output = keras.layers.BatchNormalization()(output)
 output = keras.layers.GlobalAveragePooling2D()(output)
 output = keras.layers.Flatten()(output)
-# TODO: test different regularizers
-
 output = keras.layers.Dense(512, activation='relu',  kernel_regularizer=regularizers.l2(0.003))(output)
 output = keras.layers.Dropout(0.25)(output)
 output = keras.layers.BatchNormalization()(output)
-
-# TODO: test out different Dropout
-# output = keras.layers.Dense(512)(output)
-# output = keras.layers.Dropout(0.25)(output)
-#output = keras.layers.Dense(256, activation='relu', kernel_regularizer=regularizers.l2(0.003))(output)
-# output = keras.layers.Dropout(0.25)(output)
 output = keras.layers.Dense(256, activation='relu', kernel_regularizer=regularizers.l2(0.003))(output)
 output = keras.layers.Dropout(0.25)(output)
-# output = keras.layers.Dense(128, activation='relu')(output)
-# output = keras.layers.Dropout(0.25)(output)
 # output = keras.layers.BatchNormalization()(output)
-# TODO: test out different Dropout
 output = keras.layers.Dense(1, activation='sigmoid')(output)   #sofmax results in no change of accuracy
-
 pretrained_resnet101 = Model(inputs=pretrained_resnet101.input, outputs = output)
 
-# pretrained_resnet101.summary()
 
-#Define optimizer function
-#Decay is used for smaller learning steps duing the last epochs
 #see: https://pyimagesearch.com/2019/07/22/keras-learning-rate-schedules-and-decay/
-# adam = tf.keras.optimizers.Adam(learning_rate = 0.001, decay = 1e-6)
 epochNumb = args["epochs"]
 # adam = tf.keras.optimizers.Adam(learning_rate = 0.001, decay=0.001/epochNum)
-adam = tf.keras.optimizers.Adam(learning_rate = 0.001)
+# adam = tf.keras.optimizers.Adam(learning_rate = 0.001)
 sgd = tf.keras.optimizers.SGD(learning_rate = 0.001)#0, decay = 0.0001)
 
 #Define learning decay after n iterations
-def decay_LRscheduler(epoch, lr):
-    if (epoch % 5 == 0) and (epoch != 0):
-        lr = lr*0.10
-    return  lr
-learningRate = LearningRateScheduler(decay_LRscheduler)
+# def decay_LRscheduler(epoch, lr):
+#     if (epoch % 5 == 0) and (epoch != 0):
+#         lr = lr*0.10
+#     return  lr
+# learningRate = LearningRateScheduler(decay_LRscheduler)
 
 print("Compile model:")
 pretrained_resnet101.compile(
     optimizer = sgd,
     loss="binary_crossentropy",
-    # loss="categorical_crossentropy",
-    # loss="sparse_categorical_crossentropy",
     metrics=['accuracy', Precision(), Recall(), tfa.metrics.F1Score(num_classes=1, average='macro', threshold=0.5)])
 
 #Save predictions to csv file
-# tf.keras.callbacks.CSVLogger('output history.csv', separator=",", append=False)
-# csv_logger = CSVLogger(args["csvName"], "training.csv")
 csv_logger = CSVLogger(args["csvName"])
 
 #Inspired by: https://www.geeksforgeeks.org/keras-fit-and-keras-fit_generator/
-#fit_generator is used for big datasets that does not fit in to memory
-print("Training model with Fit function")
+
 #Define early stopping condition
 early_stopping = EarlyStopping(monitor='val_loss', mode = 'min', verbose=1, patience=200)
 
@@ -175,11 +154,10 @@ history = pretrained_resnet101.fit(
     epochs=EPOCHS,
     batch_size=BATCH_SIZE,
     verbose = 1,
-    callbacks = [csv_logger, early_stopping],
-    validation_data=(validation_img_generator),
-    # callbacks=[early_stopping]
-    # validation_steps=2000
-    # steps_per_epoch=TESTING_SIZE/BATCH_SIZE
+    callbacks = [csv_logger],  #early_stopping
+    validation_data=validation_img_generator,
+    validation_steps = lenValidation,
+    # validation_steps=len(list(paths.list_images(args["validation"])))
 )
 
 # pretrained_resnet101.summary()
