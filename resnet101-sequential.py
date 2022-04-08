@@ -116,15 +116,13 @@ output = keras.layers.Flatten()(output)
 
 output = keras.layers.Dense(512, activation='relu',  kernel_regularizer=regularizers.l2(0.003))(output)
 output = keras.layers.Dropout(0.25)(output)
-output = keras.layers.BatchNormalization()(output)
+#output = keras.layers.BatchNormalization()(output)
 
 # TODO: test out different Dropout
 # output = keras.layers.Dense(512)(output)
 # output = keras.layers.Dropout(0.25)(output)
 #output = keras.layers.Dense(256, activation='relu', kernel_regularizer=regularizers.l2(0.003))(output)
 # output = keras.layers.Dropout(0.25)(output)
-output = keras.layers.Dense(256, activation='relu', kernel_regularizer=regularizers.l2(0.003))(output)
-output = keras.layers.Dropout(0.25)(output)<<<<<<< HEAD
 
 output = keras.layers.Dense(256, activation='relu', kernel_regularizer=regularizers.l2(0.003))(output)
 output = keras.layers.Dropout(0.25)(output)
