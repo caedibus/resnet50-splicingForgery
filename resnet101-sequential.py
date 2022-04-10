@@ -34,7 +34,7 @@ ap.add_argument("-t","--training", default=r'C:\Users\Malene\OneDrive - NTNU\Doc
 ap.add_argument("-e", "--epochs", type =int, default = 20, help ="Number of epochs for training")
 ap.add_argument("-b", "--batchsize", type=int, default =32, help = "Number of batch size")
 ap.add_argument("-fn", "--csvName", default='saved-output.csv', help ="Filename of csv output")
-ap.add_argument("-sm", "--saveModel", default='./save_model', help ="saved model output")
+ap.add_argument("-sm", "--saveModel", default='save_model', help ="saved model output")
 ap.add_argument("-v","--validation", default = r'C:\Users\Malene\OneDrive - NTNU\Documents\NTNU\MasterThesis-2022\Code-testing\CASIA2-trainValTest\validation', help="Path to validation directory")
 ap.add_argument("-test","--testDirectory", default = r'C:\Users\Malene\OneDrive - NTNU\Documents\NTNU\MasterThesis-2022\Code-testing\CASIA2-trainValTest\test', help="Path to testing directory")
 
@@ -112,7 +112,7 @@ for layer in pretrained_resnet101.layers:
 output = pretrained_resnet101.output
 output = keras.layers.GlobalAveragePooling2D()(output)
 output = keras.layers.Flatten()(output)
-output = keras.layers.Dense(512, activation='relu',  kernel_regularizer=regularizers.l2(0.003))(output)
+output = keras.layers.Dense(1024, activation='relu',  kernel_regularizer=regularizers.l2(0.003))(output)
 output = keras.layers.Dropout(0.25)(output)
 #output = keras.layers.BatchNormalization()(output)
 
@@ -163,7 +163,7 @@ history = pretrained_resnet101.fit(
     verbose = 1,
     callbacks = [csv_logger],  #early_stopping
     validation_data=validation_img_generator,
-    validation_steps = lenValidation,
+    # validation_steps = lenValidation,
     # validation_steps=len(list(paths.list_images(args["validation"])))
 )
 
@@ -213,7 +213,7 @@ plt.legend(['Train_acc','Val_acc', 'loss','Val_loss', 'Precision','Val_precision
 # plt.savefig("recall.pdf")
 
 
-pretrained_resnet101.save(args["saveModel"]) #, save_format="h5")
+pretrained_resnet101.save(args["saveModel"], save_format="h5")
 # pretrained_resnet101.save_weights(args["saveModel"]) #Saving weights from model performance
 
 #https://medium.com/@nsaeedster/compute-performance-metrics-f1-score-precision-accuracy-for-cnn-in-fastai-959d86b6f8ad
