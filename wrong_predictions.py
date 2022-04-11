@@ -26,7 +26,6 @@ from tensorflow.keras.models import load_model
 ap = argparse.ArgumentParser()
 # ap.add_argument("-t","--training", required=True, help="Path to training directory")
 ap.add_argument("-test","--testDirectory", default = r'C:\Users\Malene\OneDrive - NTNU\Documents\NTNU\MasterThesis-2022\Code-testing\CASIA2-trainValTest\test', help="Path to testing directory")
-ap.add_argument("-e", "--epochs", type =int, default = 20, help ="Number of epochs for training")
 ap.add_argument("-b", "--batchsize", type=int, default =32, help = "Number of batch size")
 ap.add_argument("-fn", "--csvName", default='saved-output.csv', help ="Filename of csv output")
 args = vars(ap.parse_args())
@@ -36,9 +35,9 @@ LOADED_MODEL = r'C:\Users\Malene\OneDrive - NTNU\Documents\NTNU\MasterThesis-202
 IMG_SIZE = 224
 VALIDATION_SIZE = 0.1
 SEED_VALUE = 1
-EPOCHS = args["epochs"]
 BATCH_SIZE = args["batchsize"]
-
+correct = 0
+total = 0
 
 ## FUNCTIONS
 #https://thedatafrog.com/en/articles/image-recognition-transfer-learning/
@@ -51,15 +50,22 @@ def predicted_label(pred, threshold):
 
 # Function for displaying wrongly classified images
 def compare_labels(img, true_label, predicted_label):
+    corr = 0
+    tot = 0
     for i in range(len(true_label)):
         if true_label[i] == predicted_label[i]:
-            print("Labels are equal")
+            # print("Labels are equal")
+            corr += 1
         else:
-            print("Labels are different")
+            tot += 1
+            # print("Labels are different")
             tmp_img = copy.copy(img[i])
             tmp_img2 = undo_preprocessing(tmp_img)
-            # plt.imshow(tmp_img2.astype('uint8'))
-            # plt.show()
+            plt.imshow(tmp_img2.astype('uint8'))
+            plt.show()
+    print("Corr:", corr)
+    tot += corr
+    return (corr, tot)
 
 #https://stackoverflow.com/questions/49643907/clipping-input-data-to-the-valid-range-for-imshow-with-rgb-data-0-1-for-floa
 def undo_preprocessing(x):
@@ -75,6 +81,7 @@ def undo_preprocessing(x):
 
 img_validation_generator = ImageDataGenerator(
     preprocessing_function=preprocess_input,
+    horizontal_flip=True,
 )
 
 #Declare dataset for validation split
@@ -92,7 +99,7 @@ model = keras.models.load_model(LOADED_MODEL)    #Loading entire pretrained mode
 
 # model.summary()
 
-csv_logger = CSVLogger(args["csvName"])
+# csv_logger = CSVLogger(args["csvName"])
 
 # model.fit(
 #     validation_img_generator,
@@ -101,7 +108,6 @@ csv_logger = CSVLogger(args["csvName"])
 #     verbose = 1,
 #     callbacks = [csv_logger],
 # )
-
 
 
 
@@ -126,5 +132,18 @@ for batchNum in range(len(pred_dataset)):
     # print("pred_label", pred_label)
 
     # Compare true and predicted labels.
-    compare_labels(batch_img, batch_label, pred_label)
+    out = compare_labels(batch_img, batch_label, pred_label)
+    correct += out[0]
+    total += out[1]
+    print("Correct:", correct, "Total:", total)
+print("Total images:", total)
+print("Correctly classified images:", correct)
+print("Length of dataset: ", total)
+print("Percentage:", (correct / total)*100)
     # print("")
+
+print("")
+print("Model evaluation:")
+evaluation_score = model.evaluate(validation_img_generator, return_dict=True)
+# print("%s%s: %.2f%%" % ("evaluate ",model.metrics_names[1], evaluation_score[1]*100))
+print("Evaluation score: ", evaluation_score)
