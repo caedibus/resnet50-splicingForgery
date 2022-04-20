@@ -122,10 +122,25 @@ SEED_VALUE = 30
 
 train_dataset = tf.keras.preprocessing.image_dataset_from_directory(
     args["train"],
-    batch_size = args["batchsize"],
+    validation_split = 0.2,
+    subset = 'training',
+    batch_size = BATCH_SIZE,
     image_size = (IMG_SIZE,IMG_SIZE),
     color_mode = 'rgb',
     label_mode = 'binary',
+    seed = 1,
+    labels="inferred"
+)
+
+validation_dataset = tf.keras.preprocessing.image_dataset_from_directory(
+    args["train"],
+    validation_split = 0.2,
+    subset = 'validation',
+    batch_size = BATCH_SIZE,
+    image_size = (IMG_SIZE,IMG_SIZE),
+    color_mode = 'rgb',
+    label_mode = 'binary',
+    seed = 1,
     labels="inferred"
 )
 
@@ -146,7 +161,7 @@ history = model.fit(
     batch_size=BATCH_SIZE,
     verbose = 1,
     callbacks = [csv_logger],
-    # validation_data=(validation_img_generator),
+    validation_data=validation_dataset,
     # callbacks=[early_stopping]
     # validation_steps=2000
     # steps_per_epoch=TESTING_SIZE/BATCH_SIZE
@@ -154,13 +169,13 @@ history = model.fit(
 
 #Plot model accuracy in graph
 acc = history.history['accuracy']
-# val_acc = history.history['val_accuracy']
+val_acc = history.history['val_accuracy']
 loss = history.history['loss']
-# val_loss = history.history['val_loss']
+val_loss = history.history['val_loss']
 precision = history.history['precision']
-# val_precision = history.history['val_precision']
+val_precision = history.history['val_precision']
 recall = history.history['recall']
-# val_recall = history.history['val_recall']
+val_recall = history.history['val_recall']
 #
 # epochs = range(len(acc))
 # plt.plot(epochs, acc)
