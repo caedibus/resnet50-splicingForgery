@@ -23,6 +23,7 @@ from tensorflow.keras.metrics import Precision, Recall
 from tensorflow.keras.models import load_model
 
 
+
 ap = argparse.ArgumentParser()
 # ap.add_argument("-t","--training", required=True, help="Path to training directory")
 ap.add_argument("-test","--testDirectory", default = r'C:\Users\Malene\OneDrive - NTNU\Documents\NTNU\MasterThesis-2022\Code-testing\CASIA2-trainValTest\test', help="Path to testing directory")
@@ -31,7 +32,7 @@ ap.add_argument("-fn", "--csvName", default='saved-output.csv', help ="Filename 
 args = vars(ap.parse_args())
 
 # VALIDATION_SIZE = 0.2
-LOADED_MODEL = r'C:\Users\Malene\OneDrive - NTNU\Documents\NTNU\MasterThesis-2022\Code-testing\resnet50-splicingForgery\save_model'
+LOADED_MODEL = r'C:\Users\Malene\OneDrive - NTNU\Documents\NTNU\MasterThesis-2022\Code-testing\resnet50-splicingForgery\sm-noFlipAugmentation-test86'
 IMG_SIZE = 224
 VALIDATION_SIZE = 0.1
 SEED_VALUE = 1
@@ -67,6 +68,7 @@ def compare_labels(img, true_label, predicted_label):
     tot += corr
     return (corr, tot)
 
+
 #https://stackoverflow.com/questions/49643907/clipping-input-data-to-the-valid-range-for-imshow-with-rgb-data-0-1-for-floa
 def undo_preprocessing(x):
     mean = [103.939, 116.779, 123.68]
@@ -93,6 +95,8 @@ validation_img_generator = img_validation_generator.flow_from_directory(
     seed = SEED_VALUE,
     shuffle=False,
     )
+
+# validation_img_generator =
 
 model = keras.models.load_model(LOADED_MODEL)    #Loading entire pretrained model
 # model = tf.keras.Model.load_weights('save_model2\\resnet101_weights1.h5')  #Loading weights from pretrained model
@@ -135,7 +139,8 @@ for batchNum in range(len(pred_dataset)):
     out = compare_labels(batch_img, batch_label, pred_label)
     correct += out[0]
     total += out[1]
-    print("Correct:", correct, "Total:", total)
+
+print("Correct:", correct, "Total:", total)
 print("Total images:", total)
 print("Correctly classified images:", correct)
 print("Length of dataset: ", total)

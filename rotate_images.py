@@ -17,6 +17,7 @@ for file in os.listdir(path):
     # print(file)
 
 
+
 # rotate_img = imutils.rotate(image, angle=20)
 
 # cv2.imshow(rotate_img)

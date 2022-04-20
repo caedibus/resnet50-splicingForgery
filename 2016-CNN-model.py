@@ -23,6 +23,9 @@ VALIDATION_SIZE = 0.2
 IMG_SIZE = 128
 
 
+
+
+
 inputTensor = keras.Input(shape=(IMG_SIZE, IMG_SIZE, 3))
 
 model = tf.keras.Sequential()

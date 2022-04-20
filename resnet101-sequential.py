@@ -135,6 +135,7 @@ epochNumb = args["epochs"]
 # adam = tf.keras.optimizers.Adam(learning_rate = 0.001)
 sgd = tf.keras.optimizers.SGD(learning_rate = 0.001)#0, decay = 0.0001)
 
+
 #Define learning decay after n iterations
 # def decay_LRscheduler(epoch, lr):
 #     if (epoch % 5 == 0) and (epoch != 0):
@@ -150,6 +151,9 @@ pretrained_resnet101.compile(
 
 #Save predictions to csv file
 csv_logger = CSVLogger(args["csvName"])
+
+
+
 
 #Inspired by: https://www.geeksforgeeks.org/keras-fit-and-keras-fit_generator/
 
