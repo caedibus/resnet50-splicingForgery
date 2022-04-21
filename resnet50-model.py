@@ -8,7 +8,7 @@ import tensorflow_addons as tfa
 from tensorflow.keras.metrics import Precision, Recall
 
 from tensorflow import keras
-from tensorflow.keras.callbacks import CSVLogger
+from tensorflow.keras.callbacks import CSVLogger, EarlyStopping, ReduceLROnPlateau
 from tensorflow.keras.models import Model, Sequential
 # from tensorflow.keras.applications.resnet import ResNet101
 from tensorflow.keras.applications.resnet50 import ResNet50
@@ -36,7 +36,7 @@ EPOCHS = args["epochs"]
 BATCH_SIZE = args["batchsize"]
 TESTING_SIZE = 0.8
 VALIDATION_SIZE = 0.2
-IMG_SIZE = 224
+IMG_SIZE = 256
 SEED_VALUE = 30
 
 #Decalre dataset for training split
@@ -104,7 +104,7 @@ sgd = tf.keras.optimizers.SGD(learning_rate = 0.001, momentum=0.9)
 
 print("Compile model:")
 pretrained_resnet50.compile(
-    optimizer = sgd,
+    optimizer = adam,
     loss="binary_crossentropy",
     metrics=['accuracy', Precision(), Recall(), tfa.metrics.F1Score(num_classes=1, average='macro', threshold=0.5)]
 )
@@ -113,6 +113,12 @@ pretrained_resnet50.compile(
 #Save predictions to csv file
 csv_logger = CSVLogger(args["csvName"])
 
+#Reduces LR when val_loss metric does not improve
+reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.2,
+                              patience=10, min_lr=0.001)
+
+early_stop = EarlyStopping(monitor="val_loss", patience=10)
+
 #Inspired by: https://www.geeksforgeeks.org/keras-fit-and-keras-fit_generator/
 print("Training model with Fit function")
 history = pretrained_resnet50.fit(
@@ -120,7 +126,7 @@ history = pretrained_resnet50.fit(
     epochs=EPOCHS,
     batch_size=BATCH_SIZE,
     verbose = 1,
-    callbacks = [csv_logger],
+    callbacks = [csv_logger, reduce_lr, early_stop],
     validation_data=validation_img_generator,
     # validation_steps=2000
 )
