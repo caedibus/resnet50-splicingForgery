@@ -144,7 +144,7 @@ validation_dataset = tf.keras.preprocessing.image_dataset_from_directory(
     labels="inferred"
 )
 
-sgd = tf.keras.optimizers.SGD(learning_rate = 0.001, momentum=0.99, decay= 0.0005)
+sgd = tf.keras.optimizers.SGD(learning_rate = 0.0001, momentum=0.99, decay= 0.0003)
 
 model.compile(
     optimizer=sgd,
