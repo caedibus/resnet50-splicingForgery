@@ -1,33 +1,24 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import os
-# import cv2
 import argparse
 from imutils import paths
 import tensorflow as tf
 import tensorflow_addons as tfa
-
 from tensorflow import keras
-from tensorflow.keras.callbacks import CSVLogger, LearningRateScheduler
+from tensorflow.keras.metrics import Precision, Recall
+from tensorflow.keras.callbacks import CSVLogger, LearningRateScheduler, EarlyStopping, ReduceLROnPlateau
 from tensorflow.keras.models import Model, Sequential
-# from tensorflow.keras.applications.resnet import ResNet101
 from tensorflow.keras.applications.resnet import ResNet50, ResNet101, ResNet152
-# from tensorflow.keras.applications.resnet_v2.ResNet101V2 import ResNet101V2
 from tensorflow.keras.applications.resnet  import preprocess_input, decode_predictions
-# from tensorflow.keras.applications import ResNet101
-# from tensorflow.keras.applications.resnet import ResNet101
-# from tensorflow.keras.applications.resnet101 import preprocess_input, decode_predictions
-
 from tensorflow.keras.preprocessing import image
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from tensorflow.keras import layers, regularizers
 from tensorflow.keras.regularizers import l2
-from tensorflow.keras.callbacks import EarlyStopping
 from tensorflow.keras import optimizers
 from tensorflow.keras.layers import InputLayer
-from tensorflow.keras.metrics import Precision, Recall
 
-
+from sklearn.utils import compute_class_weight
 
 ap = argparse.ArgumentParser()
 ap.add_argument("-t","--training", default=r'C:\Users\Malene\OneDrive - NTNU\Documents\NTNU\MasterThesis-2022\Code-testing\CASIA2-trainValTest\train', help="Path to training directory")
@@ -154,14 +145,21 @@ csv_logger = CSVLogger(args["csvName"])
 #Inspired by: https://www.geeksforgeeks.org/keras-fit-and-keras-fit_generator/
 
 #Define early stopping condition
-early_stopping = EarlyStopping(monitor='val_loss', mode = 'min', verbose=1, patience=200)
+early_stopping = EarlyStopping(monitor='val_loss', mode = 'min', verbose=1, patience=50)
+reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.3, patience=10, min_lr=0.001)
+# class_weight = {0:3, 1:2}
+class_weight = {0:1, 1:0.6}
+# train_class = train_img_generator.classes
+class_weight = compute_class_weight(class_weight='balanced', classes = np.unique(train_img_generator.classes), y = train_img_generator.classes)
+class_weight = dict(zip(np.unique(train_img_generator.classes), class_weight))
 
 history = pretrained_resnet101.fit(
     train_img_generator,
     epochs=EPOCHS,
     batch_size=BATCH_SIZE,
     verbose = 1,
-    callbacks = [csv_logger],  #early_stopping
+    class_weight=class_weight,
+    callbacks = [csv_logger, reduce_lr, early_stopping],  #early_stopping
     validation_data=validation_img_generator,
     # validation_steps = lenValidation,
     # validation_steps=len(list(paths.list_images(args["validation"])))
