@@ -56,8 +56,8 @@ train_datagen = ImageDataGenerator(
     # validation_split=VALIDATION_SIZE,
     rotation_range=30,
     height_shift_range=0.2,
-#    vertical_flip = True,
-#    horizontal_flip=True
+    vertical_flip = True,
+    horizontal_flip=True
 )
 
 #Don't know if I need further preprocessing here:
@@ -135,7 +135,6 @@ epochNumb = args["epochs"]
 # adam = tf.keras.optimizers.Adam(learning_rate = 0.001)
 sgd = tf.keras.optimizers.SGD(learning_rate = 0.001)#0, decay = 0.0001)
 
-
 #Define learning decay after n iterations
 # def decay_LRscheduler(epoch, lr):
 #     if (epoch % 5 == 0) and (epoch != 0):
@@ -151,9 +150,6 @@ pretrained_resnet101.compile(
 
 #Save predictions to csv file
 csv_logger = CSVLogger(args["csvName"])
-
-
-
 
 #Inspired by: https://www.geeksforgeeks.org/keras-fit-and-keras-fit_generator/
 
