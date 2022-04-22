@@ -26,13 +26,13 @@ from tensorflow.keras.models import load_model
 
 ap = argparse.ArgumentParser()
 # ap.add_argument("-t","--training", required=True, help="Path to training directory")
-ap.add_argument("-test","--testDirectory", default = r'C:\Users\Malene\OneDrive - NTNU\Documents\NTNU\MasterThesis-2022\Code-testing\CASIA2-trainValTest\test', help="Path to testing directory")
+ap.add_argument("-test","--testDirectory", default = r'C:\Users\Malene\OneDrive - NTNU\Documents\NTNU\MasterThesis-2022\Code-testing\CASIA2-trainValTest2\test', help="Path to testing directory")
 ap.add_argument("-b", "--batchsize", type=int, default =32, help = "Number of batch size")
 ap.add_argument("-fn", "--csvName", default='saved-output.csv', help ="Filename of csv output")
 args = vars(ap.parse_args())
 
 # VALIDATION_SIZE = 0.2
-LOADED_MODEL = r'C:\Users\Malene\OneDrive - NTNU\Documents\NTNU\MasterThesis-2022\Code-testing\resnet50-splicingForgery\sm-noFlipAugmentation-test86'
+LOADED_MODEL = r'C:\Users\Malene\OneDrive - NTNU\Documents\NTNU\MasterThesis-2022\Code-testing\resnet50-splicingForgery\res101-test94'
 IMG_SIZE = 224
 VALIDATION_SIZE = 0.1
 SEED_VALUE = 1
@@ -62,8 +62,8 @@ def compare_labels(img, true_label, predicted_label):
             # print("Labels are different")
             tmp_img = copy.copy(img[i])
             tmp_img2 = undo_preprocessing(tmp_img)
-            plt.imshow(tmp_img2.astype('uint8'))
-            plt.show()
+            # plt.imshow(tmp_img2.astype('uint8'))
+            # plt.show()
     print("Corr:", corr)
     tot += corr
     return (corr, tot)
