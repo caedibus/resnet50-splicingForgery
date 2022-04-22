@@ -107,7 +107,7 @@ output = keras.layers.Dense(1024, activation='relu',  kernel_regularizer=regular
 output = keras.layers.Dropout(0.15)(output)
 output = keras.layers.Dense(256, activation='relu', kernel_regularizer=regularizers.l2(0.003))(output)
 output = keras.layers.Dropout(0.25)(output)
-output = keras.layers.Dense(1, activation='softmax')(output)
+output = keras.layers.Dense(1, activation='sigmoid')(output)  #Only use softmax for categorical class_mode
 pretrained_resnet101 = Model(inputs=pretrained_resnet101.input, outputs = output)
 
 
@@ -128,7 +128,7 @@ pretrained_resnet101.summary()
 
 print("Compile model:")
 pretrained_resnet101.compile(
-    optimizer = adam,
+    optimizer = sgd,
     loss="binary_crossentropy",
     metrics=['accuracy', Precision(), Recall(), tfa.metrics.F1Score(num_classes=1, average='macro', threshold=0.5)])
 
@@ -153,7 +153,7 @@ history = pretrained_resnet101.fit(
     batch_size=BATCH_SIZE,
     verbose = 1,
     class_weight=class_weight,
-    callbacks = [csv_logger], #, reduce_lr, early_stopping],  #early_stopping
+    callbacks = [csv_logger, reduce_lr, early_stopping],  #early_stopping
     validation_data=validation_img_generator,
     # validation_steps = lenValidation,
     # validation_steps=len(list(paths.list_images(args["validation"])))
