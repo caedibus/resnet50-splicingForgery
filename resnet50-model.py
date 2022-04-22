@@ -114,7 +114,6 @@ pretrained_resnet50.compile(
 csv_logger = CSVLogger(args["csvName"])
 
 #Reduces LR when val_loss metric does not improve
-<<<<<<< HEAD
 reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.2,
                               patience=10, min_lr=0.01)
 
