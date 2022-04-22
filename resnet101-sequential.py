@@ -56,7 +56,7 @@ train_img_generator = train_datagen.flow_from_directory(
     directory = args["training"],
     target_size=(IMG_SIZE,IMG_SIZE),
     batch_size = BATCH_SIZE,
-    class_mode = 'categorical',
+    class_mode = 'binary',
     seed = SEED_VALUE,
     shuffle=False,
     # color_mode = 'rgb',
@@ -78,7 +78,7 @@ validation_img_generator = img_validation_generator.flow_from_directory(
     target_size = (IMG_SIZE,IMG_SIZE),
     batch_size = 10,
     # batch_size = BATCH_SIZE,
-    class_mode = 'categorical',
+    class_mode = 'binary',
     seed = SEED_VALUE,
     shuffle=False,
     # subset = 'validation',
@@ -88,7 +88,7 @@ testing_generator = img_validation_generator.flow_from_directory(
     directory = args["testDirectory"],
     target_size=(IMG_SIZE,IMG_SIZE),
     batch_size = BATCH_SIZE,
-    class_mode = 'categorical',
+    class_mode = 'binary',
     seed = SEED_VALUE,
     shuffle=False,
 )
@@ -107,14 +107,14 @@ output = keras.layers.Dense(1024, activation='relu',  kernel_regularizer=regular
 output = keras.layers.Dropout(0.15)(output)
 output = keras.layers.Dense(256, activation='relu', kernel_regularizer=regularizers.l2(0.003))(output)
 output = keras.layers.Dropout(0.25)(output)
-output = keras.layers.Dense(2, activation='sigmoid')(output)
+output = keras.layers.Dense(1, activation='sigmoid')(output)  #Only use softmax for categorical class_mode
 pretrained_resnet101 = Model(inputs=pretrained_resnet101.input, outputs = output)
 
 
 #see: https://pyimagesearch.com/2019/07/22/keras-learning-rate-schedules-and-decay/
 epochNumb = args["epochs"]
 # adam = tf.keras.optimizers.Adam(learning_rate = 0.001, decay=0.001/epochNum)
-# adam = tf.keras.optimizers.Adam(learning_rate = 0.001)
+adam = tf.keras.optimizers.Adam(learning_rate = 0.0001)
 sgd = tf.keras.optimizers.SGD(learning_rate = 0.001)#0, decay = 0.0001)
 
 #Define learning decay after n iterations
@@ -124,10 +124,12 @@ sgd = tf.keras.optimizers.SGD(learning_rate = 0.001)#0, decay = 0.0001)
 #     return  lr
 # learningRate = LearningRateScheduler(decay_LRscheduler)
 
+pretrained_resnet101.summary()
+
 print("Compile model:")
 pretrained_resnet101.compile(
     optimizer = sgd,
-    loss="categorical_crossentropy",
+    loss="binary_crossentropy",
     metrics=['accuracy', Precision(), Recall(), tfa.metrics.F1Score(num_classes=1, average='macro', threshold=0.5)])
 
 #Save predictions to csv file
@@ -138,10 +140,9 @@ csv_logger = CSVLogger(args["csvName"])
 #Define early stopping condition
 early_stopping = EarlyStopping(monitor='val_loss', mode = 'min', verbose=1, patience=50)
 reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.3, patience=10, min_lr=0.001)
-# class_weight = {0:3, 1:2}
-#class_weight = {0:1, 1:0.6}
-
 #https://stackoverflow.com/questions/49031309/valueerror-class-weight-must-contain-all-classes-in-the-data-the-classes-1
+# class_weight = {0:3, 1:2}
+# class_weight = {0:1, 1:0.6}
 class_weight = compute_class_weight(class_weight='balanced', classes = np.unique(train_img_generator.classes), y = train_img_generator.classes)
 class_weight = dict(zip(np.unique(train_img_generator.classes), class_weight))
 
@@ -151,7 +152,7 @@ history = pretrained_resnet101.fit(
     batch_size=BATCH_SIZE,
     verbose = 1,
     class_weight=class_weight,
-    callbacks = [csv_logger], #, reduce_lr, early_stopping],  #early_stopping
+    callbacks = [csv_logger, reduce_lr, early_stopping],  #early_stopping
     validation_data=validation_img_generator,
     # validation_steps = lenValidation,
     # validation_steps=len(list(paths.list_images(args["validation"])))
