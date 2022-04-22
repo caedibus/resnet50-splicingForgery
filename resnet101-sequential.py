@@ -45,10 +45,10 @@ print("lenValidation ", lenValidation)
 train_datagen = ImageDataGenerator(
     preprocessing_function=preprocess_input,
     # validation_split=VALIDATION_SIZE,
-    rotation_range=30,
-    height_shift_range=0.2,
-    vertical_flip = True,
-    horizontal_flip=True
+    #rotation_range=30,
+    #height_shift_range=0.2,
+    #vertical_flip = True,
+    #horizontal_flip=True
 )
 
 #Don't know if I need further preprocessing here:
@@ -139,7 +139,7 @@ csv_logger = CSVLogger(args["csvName"])
 early_stopping = EarlyStopping(monitor='val_loss', mode = 'min', verbose=1, patience=50)
 reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.3, patience=10, min_lr=0.001)
 # class_weight = {0:3, 1:2}
-class_weight = {0:1, 1:0.6}
+#class_weight = {0:1, 1:0.6}
 
 #https://stackoverflow.com/questions/49031309/valueerror-class-weight-must-contain-all-classes-in-the-data-the-classes-1
 class_weight = compute_class_weight(class_weight='balanced', classes = np.unique(train_img_generator.classes), y = train_img_generator.classes)
