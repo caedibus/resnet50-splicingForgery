@@ -9,6 +9,10 @@ from tensorflow import keras
 from tensorflow.keras.metrics import Precision, Recall
 from tensorflow.keras.callbacks import CSVLogger, LearningRateScheduler, EarlyStopping, ReduceLROnPlateau
 from tensorflow.keras.models import Model, Sequential
+
+from tensorflow.keras.applications.resnet50 import ResNet50
+from tensorflow.keras.applications.resnet50 import preprocess_input, decode_predictions
+
 from tensorflow.keras.applications.resnet import ResNet50, ResNet101, ResNet152
 from tensorflow.keras.applications.resnet  import preprocess_input, decode_predictions
 from tensorflow.keras.preprocessing import image
@@ -24,13 +28,12 @@ ap = argparse.ArgumentParser()
 ap.add_argument("-t","--training", default=r'C:\Users\Malene\OneDrive - NTNU\Documents\NTNU\MasterThesis-2022\Code-testing\CASIA2-trainValTest\train', help="Path to training directory")
 ap.add_argument("-e", "--epochs", type =int, default = 20, help ="Number of epochs for training")
 ap.add_argument("-b", "--batchsize", type=int, default =32, help = "Number of batch size")
-ap.add_argument("-fn", "--csvName", default='saved-output.csv', help ="Filename of csv output")
-ap.add_argument("-sm", "--saveModel", default='save_model2', help ="saved model output")
+ap.add_argument("-fn", "--csvName", default='res50asRes101-saved-output.csv', help ="Filename of csv output")
+ap.add_argument("-sm", "--saveModel", default='save_model-res50asRes101', help ="saved model output")
 ap.add_argument("-v","--validation", default = r'C:\Users\Malene\OneDrive - NTNU\Documents\NTNU\MasterThesis-2022\Code-testing\CASIA2-trainValTest\validation', help="Path to validation directory")
 ap.add_argument("-test","--testDirectory", default = r'C:\Users\Malene\OneDrive - NTNU\Documents\NTNU\MasterThesis-2022\Code-testing\CASIA2-trainValTest\test', help="Path to testing directory")
 
 args = vars(ap.parse_args())
-
 
 EPOCHS = args["epochs"]
 BATCH_SIZE = args["batchsize"]
@@ -45,10 +48,10 @@ print("lenValidation ", lenValidation)
 train_datagen = ImageDataGenerator(
     preprocessing_function=preprocess_input,
     # validation_split=VALIDATION_SIZE,
-    rotation_range=30,
-    height_shift_range=0.2,
-    vertical_flip = True,
-    horizontal_flip=True
+    # rotation_range=30,
+    # height_shift_range=0.2,
+    # vertical_flip = True,
+    # horizontal_flip=True
 )
 
 #Don't know if I need further preprocessing here:
@@ -95,12 +98,12 @@ testing_generator = img_validation_generator.flow_from_directory(
 
 inputTensor = keras.Input(shape=(IMG_SIZE, IMG_SIZE, 3))
 
-pretrained_resnet101 = keras.applications.resnet.ResNet101(include_top=False, weights='imagenet', input_tensor=inputTensor)
+pretrained_resnet50 = keras.applications.ResNet50(include_top=False, weights='imagenet', input_tensor=inputTensor)
 
-for layer in pretrained_resnet101.layers:
+for layer in pretrained_resnet50.layers:
     layer.trainable = False
 
-output = pretrained_resnet101.output
+output = pretrained_resnet50.output
 output = keras.layers.GlobalAveragePooling2D()(output)
 output = keras.layers.Flatten()(output)
 output = keras.layers.Dense(1024, activation='relu',  kernel_regularizer=regularizers.l2(0.003))(output)
@@ -108,7 +111,7 @@ output = keras.layers.Dropout(0.15)(output)
 output = keras.layers.Dense(256, activation='relu', kernel_regularizer=regularizers.l2(0.003))(output)
 output = keras.layers.Dropout(0.25)(output)
 output = keras.layers.Dense(1, activation='sigmoid')(output)  #Only use softmax for categorical class_mode
-pretrained_resnet101 = Model(inputs=pretrained_resnet101.input, outputs = output)
+pretrained_resnet50 = Model(inputs=pretrained_resnet50.input, outputs = output)
 
 
 #see: https://pyimagesearch.com/2019/07/22/keras-learning-rate-schedules-and-decay/
@@ -124,10 +127,10 @@ sgd = tf.keras.optimizers.SGD(learning_rate = 0.001)#0, decay = 0.0001)
 #     return  lr
 # learningRate = LearningRateScheduler(decay_LRscheduler)
 
-# pretrained_resnet101.summary()
+pretrained_resnet50.summary()
 
 print("Compile model:")
-pretrained_resnet101.compile(
+pretrained_resnet50.compile(
     optimizer = sgd,
     loss="binary_crossentropy",
     metrics=['accuracy', Precision(), Recall(), tfa.metrics.F1Score(num_classes=1, average='macro', threshold=0.5)])
@@ -147,7 +150,7 @@ reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.3, patience=10, min_l
 class_weight = compute_class_weight(class_weight='balanced', classes = np.unique(train_img_generator.classes), y = train_img_generator.classes)
 class_weight = dict(zip(np.unique(train_img_generator.classes), class_weight))
 
-history = pretrained_resnet101.fit(
+history = pretrained_resnet50.fit(
     train_img_generator,
     epochs=EPOCHS,
     batch_size=BATCH_SIZE,
@@ -159,7 +162,7 @@ history = pretrained_resnet101.fit(
     # validation_steps=len(list(paths.list_images(args["validation"])))
 )
 
-# pretrained_resnet101.summary()
+# pretrained_resnet50.summary()
 
 
 
@@ -205,8 +208,8 @@ plt.legend(['Train_acc','Val_acc', 'loss','Val_loss', 'Precision','Val_precision
 # plt.savefig("recall.pdf")
 
 
-pretrained_resnet101.save(args["saveModel"])
-# pretrained_resnet101.save_weights(args["saveModel"]) #Saving weights from model performance
+pretrained_resnet50.save(args["saveModel"])
+# pretrained_resnet50.save_weights(args["saveModel"]) #Saving weights from model performance
 
 #https://medium.com/@nsaeedster/compute-performance-metrics-f1-score-precision-accuracy-for-cnn-in-fastai-959d86b6f8ad
 # See for calling images that have been wronly predicted

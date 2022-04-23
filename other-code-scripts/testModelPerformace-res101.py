@@ -25,7 +25,7 @@ ap.add_argument("-b", "--batchsize", type=int, default =32, help = "Number of ba
 ap.add_argument("-fn", "--csvName", default='saved-output.csv', help ="Filename of csv output")
 args = vars(ap.parse_args())
 
-LOADED_MODEL = r'C:\Users\Malene\OneDrive - NTNU\Documents\NTNU\MasterThesis-2022\Code-testing\resnet50-splicingForgery\save_model'
+LOADED_MODEL = r'C:\Users\Malene\OneDrive - NTNU\Documents\NTNU\MasterThesis-2022\Code-testing\resnet50-splicingForgery\sm-test86'
 IMG_SIZE = 224
 SEED_VALUE = 1
 EPOCHS = args["epochs"]
