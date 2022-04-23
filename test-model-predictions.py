@@ -32,9 +32,11 @@ ap.add_argument("-test","--testDirectory", default = r'C:\Users\Malene\OneDrive 
 ap.add_argument("-e", "--epochs", type =int, default = 20, help ="Number of epochs for training")
 ap.add_argument("-b", "--batchsize", type=int, default =32, help = "Number of batch size")
 ap.add_argument("-fn", "--csvName", default='saved-output.csv', help ="Filename of csv output")
+ap.add_argument("-l", "--loadModel", default='res101-test94', help ="loaded model")
+
 args = vars(ap.parse_args())
 
-LOADED_MODEL = r'C:\Users\Malene\OneDrive - NTNU\Documents\NTNU\MasterThesis-2022\Code-testing\resnet50-splicingForgery\res101-test94'
+LOADED_MODEL = args["loadModel"]
 IMG_SIZE = 224
 SEED_VALUE = 1
 # EPOCHS = args["epochs"]
