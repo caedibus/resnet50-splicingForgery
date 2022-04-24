@@ -46,7 +46,8 @@ train_datagen = ImageDataGenerator(
     preprocessing_function=preprocess_input,
     # validation_split=VALIDATION_SIZE,
     #rotation_range=30,
-    #height_shift_range=0.2,
+    height_shift_range=0.2,
+    width_shift_range=0.2,
     #vertical_flip = True,
     #horizontal_flip=True
 )
