@@ -28,18 +28,15 @@ from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 
 ap = argparse.ArgumentParser()
 # ap.add_argument("-t","--training", required=True, help="Path to training directory")
-ap.add_argument("-test","--testDirectory", default = r'C:\Users\Malene\OneDrive - NTNU\Documents\NTNU\MasterThesis-2022\Code-testing\CASIA2-trainValTest2\test', help="Path to testing directory")
-ap.add_argument("-e", "--epochs", type =int, default = 20, help ="Number of epochs for training")
-ap.add_argument("-b", "--batchsize", type=int, default =32, help = "Number of batch size")
-ap.add_argument("-fn", "--csvName", default='saved-output.csv', help ="Filename of csv output")
-ap.add_argument("-l", "--loadModel", default='res101-test94', help ="loaded model")
+ap.add_argument("-test","--testDirectory", default = r'C:\Users\Malene\OneDrive - NTNU\Documents\NTNU\MasterThesis-2022\Code-testing\CASIA2-NEW-trainValTest-ELA-quality90\test', help="Path to testing directory")
+ap.add_argument("-b", "--batchsize", type=int, default =16, help = "Number of batch size")
+ap.add_argument("-l", "--loadModel", default=r'C:\Users\Malene\OneDrive - NTNU\Documents\NTNU\MasterThesis-2022\Code-testing\resnet50-splicingForgery\elaCNN-test17', help ="loaded model")
 
 args = vars(ap.parse_args())
 
 LOADED_MODEL = args["loadModel"]
-IMG_SIZE = 224
+IMG_SIZE = 256
 SEED_VALUE = 1
-# EPOCHS = args["epochs"]
 BATCH_SIZE = args["batchsize"]
 
 f1_score = tfa.metrics.F1Score(num_classes=1, average='macro', threshold=0.5)
@@ -60,7 +57,7 @@ testing_generator = img_generator.flow_from_directory(
     directory = args["testDirectory"],
     target_size = (IMG_SIZE,IMG_SIZE),
     batch_size = BATCH_SIZE,
-    class_mode = 'categorical',
+    class_mode = 'binary',
     seed = SEED_VALUE,
     shuffle=False
 )
@@ -72,20 +69,28 @@ model = keras.models.load_model(LOADED_MODEL, custom_objects={'f1_score': f1_sco
 
 # model.summary()
 
-csv_logger = CSVLogger(args["csvName"])
+# csv_logger = CSVLogger(args["csvName"])
 
 history = model.predict_generator(
     testing_generator,
     verbose = 2,
-    callbacks = [csv_logger]
+    # callbacks = [csv_logger]
 )
+
+
 print("Prediction completed")
 #DeepLizard tutorial
 # test_img, test_label = next(testing_generator)
 # plots(test_img, titles=test_label)
 
 print("\nHistory: ", history)
+outFile = open("historyOutTest.txt", "a")
+for line in history:
+    strOut = str(line)
+    outFile.write(strOut)
+outFile.close()
 
+# np.save("elaCNN-history.npy", history.history)
 # Get predicte dclasses from model.fit()
 # https://stackoverflow.com/questions/64622210/how-to-extract-classes-from-prefetched-dataset-in-tensorflow-for-confusion-matri
 # predicted_class = np.argmax(history, axis = 1)
@@ -109,7 +114,8 @@ print("Class_label ", class_label)
 #Define test report
 test_report = classification_report(true_classes, predicted_class, target_names=class_label)
 conf_matrix = confusion_matrix(true_classes, predicted_class)
-print("\ntest report: ", test_report)
+print("")
+print(test_report)
 print("")
 print(conf_matrix)
 
@@ -119,6 +125,9 @@ conf_mat = ConfusionMatrixDisplay(confusion_matrix=conf_matrix, display_labels=c
 plt.imshow(conf_matrix)
 conf_mat.plot()
 plt.show()
+
+# print("F1 score: ", f1_score)
+
 # history = np.argmax(history, axis = 1)
 # print(classification_report(img_generator.labels, history,
 #                             target_names=["class 1", "class 2"]))

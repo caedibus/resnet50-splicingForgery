@@ -49,7 +49,8 @@ train_datagen = ImageDataGenerator(
     preprocessing_function=preprocess_input,
     # validation_split=VALIDATION_SIZE,
     # rotation_range=30,
-    # height_shift_range=0.2,
+    height_shift_range=0.2,
+    width_shift_range=0.2,
     # vertical_flip = True,
     # horizontal_flip=True
 )
@@ -64,7 +65,7 @@ train_img_generator = train_datagen.flow_from_directory(
     shuffle=False,
     # color_mode = 'rgb',
     # subset = 'training'
-    )
+)
 
 img_validation_generator = ImageDataGenerator(
     preprocessing_function=preprocess_input,
@@ -85,7 +86,7 @@ validation_img_generator = img_validation_generator.flow_from_directory(
     seed = SEED_VALUE,
     shuffle=False,
     # subset = 'validation',
-    )
+)
 
 testing_generator = img_validation_generator.flow_from_directory(
     directory = args["testDirectory"],
@@ -120,14 +121,8 @@ epochNumb = args["epochs"]
 adam = tf.keras.optimizers.Adam(learning_rate = 0.0001)
 sgd = tf.keras.optimizers.SGD(learning_rate = 0.001)#0, decay = 0.0001)
 
-#Define learning decay after n iterations
-# def decay_LRscheduler(epoch, lr):
-#     if (epoch % 5 == 0) and (epoch != 0):
-#         lr = lr*0.10
-#     return  lr
-# learningRate = LearningRateScheduler(decay_LRscheduler)
 
-pretrained_resnet50.summary()
+# pretrained_resnet50.summary()
 
 print("Compile model:")
 pretrained_resnet50.compile(
@@ -209,10 +204,3 @@ plt.legend(['Train_acc','Val_acc', 'loss','Val_loss', 'Precision','Val_precision
 
 
 pretrained_resnet50.save(args["saveModel"])
-# pretrained_resnet50.save_weights(args["saveModel"]) #Saving weights from model performance
-
-#https://medium.com/@nsaeedster/compute-performance-metrics-f1-score-precision-accuracy-for-cnn-in-fastai-959d86b6f8ad
-# See for calling images that have been wronly predicted
-
-
-#--------------------- DISPLAY WRONGLY PREDICTED IMAGES ------------------------

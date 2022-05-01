@@ -12,8 +12,10 @@ from tensorflow.keras.callbacks import CSVLogger, EarlyStopping, ReduceLROnPlate
 from tensorflow.keras.models import Model, Sequential
 # from tensorflow.keras.applications.resnet import ResNet101
 from tensorflow.keras.applications.resnet50 import ResNet50
-from tensorflow.keras.applications.resnet50 import preprocess_input, decode_predictions
-# from tensorflow.keras.applications.resnet  import preprocess_input, decode_predictions
+# from tensorflow.keras.applications.resnet50 import preprocess_input, decode_predictions
+
+from tensorflow.keras.applications.resnet import ResNet101
+from tensorflow.keras.applications.resnet  import preprocess_input, decode_predictions
 from tensorflow.keras.preprocessing import image
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from tensorflow.keras import layers
@@ -67,29 +69,29 @@ validation_img_generator = img_validation_generator.flow_from_directory(
 
 inputTensor = keras.Input(shape=(IMG_SIZE, IMG_SIZE, 3))
 
-pretrained_resnet50 = keras.applications.ResNet50(include_top=False, weights='imagenet', input_tensor=inputTensor)
+pretrained_resnet50 = keras.applications.ResNet101(include_top=False, weights='imagenet', input_tensor=inputTensor)
 
 for layer in pretrained_resnet50.layers:
     layer.trainable = False
 output = pretrained_resnet50.output
 output = keras.layers.GlobalAveragePooling2D()(output)
 output = keras.layers.Flatten()(output)
-output = keras.layers.Dense(512, activation='relu')(output)
-output = keras.layers.Dropout(0.25)(output)
 output = keras.layers.Dense(256, activation='relu')(output)
-output = keras.layers.Dropout(0.3)(output)
+output = keras.layers.Dropout(0.25)(output)
+# output = keras.layers.Dense(256, activation='relu')(output)
+# output = keras.layers.Dropout(0.25)(output)
 output = keras.layers.Dense(1, activation='sigmoid')(output)
 
 pretrained_resnet50 = Model(inputs=pretrained_resnet50.input, outputs = output)
 
-pretrained_resnet50.summary()
+# pretrained_resnet50.summary()
 
 #Define optimizer function
 #Decay is used for smaller learning steps duing the last epochs
 #see: https://pyimagesearch.com/2019/07/22/keras-learning-rate-schedules-and-decay/
 
 adam = tf.keras.optimizers.Adam(learning_rate = 0.0001)
-sgd = tf.keras.optimizers.SGD(learning_rate = 0.001, momentum=0.9)
+# sgd = tf.keras.optimizers.SGD(learning_rate = 0.001, momentum=0.9)
 
 print("Compile model:")
 pretrained_resnet50.compile(
@@ -103,8 +105,7 @@ pretrained_resnet50.compile(
 csv_logger = CSVLogger(args["csvName"])
 
 #Reduces LR when val_loss metric does not improve
-reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.2,
-                              patience=10, min_lr=0.01)
+reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.2, patience=10, min_lr=0.001)
 
 early_stop = EarlyStopping(monitor="val_loss", patience=10)
 
