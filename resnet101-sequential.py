@@ -45,11 +45,11 @@ print("lenValidation ", lenValidation)
 train_datagen = ImageDataGenerator(
     preprocessing_function=preprocess_input,
     # validation_split=VALIDATION_SIZE,
-    #rotation_range=30,
-    height_shift_range=0.2,
-    width_shift_range=0.2,
-    #vertical_flip = True,
-    #horizontal_flip=True
+    rotation_range=30,
+    height_shift_range=0.1,
+    #width_shift_range=0.1,
+    vertical_flip = True,
+    horizontal_flip=True
 )
 
 #Don't know if I need further preprocessing here:
@@ -106,8 +106,10 @@ output = keras.layers.GlobalAveragePooling2D()(output)
 output = keras.layers.Flatten()(output)
 output = keras.layers.Dense(1024, activation='relu',  kernel_regularizer=regularizers.l2(0.003))(output)
 output = keras.layers.Dropout(0.15)(output)
+output = keras.layers.Flatten()(output)
 output = keras.layers.Dense(256, activation='relu', kernel_regularizer=regularizers.l2(0.003))(output)
 output = keras.layers.Dropout(0.25)(output)
+output = keras.layers.Flatten()(output)
 output = keras.layers.Dense(1, activation='sigmoid')(output)  #Only use softmax for categorical class_mode
 pretrained_resnet101 = Model(inputs=pretrained_resnet101.input, outputs = output)
 
