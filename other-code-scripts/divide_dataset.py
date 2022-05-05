@@ -4,9 +4,9 @@ import random
 import shutil
 
 #Path to original dataset
-original_path = r'C:\Users\Malene\OneDrive - NTNU\Documents\NTNU\MasterThesis-2022\Code-testing\CASIA2.0-CM-splicing-ELA'
+original_path = r'C:\Users\Malene\OneDrive - NTNU\Documents\NTNU\MasterThesis-2022\Code-testing\CASIA2.0-CM-splicing-jpg'
 #path to where edivided dataset is located
-BASE_PATH = r'C:\Users\Malene\OneDrive - NTNU\Documents\NTNU\MasterThesis-2022\Code-testing\CASIA2-trainValTest'
+BASE_PATH = r'C:\Users\Malene\OneDrive - NTNU\Documents\NTNU\MasterThesis-2022\Code-testing\CASIA2-trainValTest-jpg'
 
 #define the derived folders for train, validation and testing training_directory
 
@@ -14,8 +14,8 @@ TRAIN_PATH = os.path.sep.join([BASE_PATH, "train"])
 VAL_PATH = os.path.sep.join([BASE_PATH, "validation"])
 TEST_PATH = os.path.sep.join([BASE_PATH, "test"])
 
-train_split = 0.75
-val_split = 0.15
+train_split = 0.8
+val_split = 0.2
 
 imagePath = list(paths.list_images(original_path))
 random.seed(42)

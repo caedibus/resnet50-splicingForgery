@@ -21,13 +21,13 @@ from tensorflow.keras.layers import InputLayer
 from sklearn.utils import compute_class_weight
 
 ap = argparse.ArgumentParser()
-ap.add_argument("-t","--training", default=r'C:\Users\Malene\OneDrive - NTNU\Documents\NTNU\MasterThesis-2022\Code-testing\CASIA2-trainValTest\train', help="Path to training directory")
+ap.add_argument("-t","--training", default=r'C:\Users\Malene\OneDrive - NTNU\Documents\NTNU\MasterThesis-2022\Code-testing\CASIA2-NEW-trainValTest-ELA-quality90\train', help="Path to training directory")
 ap.add_argument("-e", "--epochs", type =int, default = 20, help ="Number of epochs for training")
 ap.add_argument("-b", "--batchsize", type=int, default =32, help = "Number of batch size")
-ap.add_argument("-fn", "--csvName", default='saved-output.csv', help ="Filename of csv output")
-ap.add_argument("-sm", "--saveModel", default='save_model2', help ="saved model output")
-ap.add_argument("-v","--validation", default = r'C:\Users\Malene\OneDrive - NTNU\Documents\NTNU\MasterThesis-2022\Code-testing\CASIA2-trainValTest\validation', help="Path to validation directory")
-ap.add_argument("-test","--testDirectory", default = r'C:\Users\Malene\OneDrive - NTNU\Documents\NTNU\MasterThesis-2022\Code-testing\CASIA2-trainValTest\test', help="Path to testing directory")
+ap.add_argument("-fn", "--csvName", default='res101-saved-output.csv', help ="Filename of csv output")
+ap.add_argument("-sm", "--saveModel", default='res101-save_model2', help ="saved model output")
+ap.add_argument("-v","--validation", default = r'C:\Users\Malene\OneDrive - NTNU\Documents\NTNU\MasterThesis-2022\Code-testing\CASIA2-NEW-trainValTest-ELA-quality90\validation', help="Path to validation directory")
+ap.add_argument("-test","--testDirectory", default = r'C:\Users\Malene\OneDrive - NTNU\Documents\NTNU\MasterThesis-2022\Code-testing\CASIA2-NEW-trainValTest-ELA-quality90\test', help="Path to testing directory")
 
 args = vars(ap.parse_args())
 
@@ -46,8 +46,8 @@ train_datagen = ImageDataGenerator(
     preprocessing_function=preprocess_input,
     # validation_split=VALIDATION_SIZE,
     rotation_range=30,
-    height_shift_range=0.1,
-    #width_shift_range=0.1,
+    height_shift_range=0.2,
+    # width_shift_range=0.2,
     vertical_flip = True,
     horizontal_flip=True
 )
