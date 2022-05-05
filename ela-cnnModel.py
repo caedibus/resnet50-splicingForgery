@@ -32,7 +32,7 @@ args = vars(ap.parse_args())
 
 EPOCHS = args["epochs"]
 BATCH_SIZE = args["batchsize"]
-IMG_SIZE = 256
+IMG_SIZE = 128
 SEED_VALUE = 30
 
 train_dataset = tf.keras.preprocessing.image_dataset_from_directory(
@@ -42,11 +42,16 @@ train_dataset = tf.keras.preprocessing.image_dataset_from_directory(
     color_mode = 'rgb',
     label_mode = 'binary',
     seed = 1,
+    subset="training",
+    validation_split = 0.2,
     labels="inferred"
 )
 
 validation_dataset = tf.keras.preprocessing.image_dataset_from_directory(
-    args["validation"],
+    # args["validation"],
+    args["train"],
+    subset="validation",
+    validation_split = 0.2,
     batch_size = BATCH_SIZE,
     image_size = (IMG_SIZE,IMG_SIZE),
     color_mode = 'rgb',
@@ -58,8 +63,8 @@ validation_dataset = tf.keras.preprocessing.image_dataset_from_directory(
 model = tf.keras.Sequential()
 model.add(tf.keras.layers.Conv2D(32 , kernel_size=(3,3), activation ='relu')) #input_shape=(IMG_SIZE,IMG_SIZE,3)))
 model.add(tf.keras.layers.MaxPooling2D(pool_size=(2, 2)))
-model.add(tf.keras.layers.Conv2D(32 , kernel_size=(3,3), activation ='relu')) #input_shape=(IMG_SIZE,IMG_SIZE,3)))
-model.add(tf.keras.layers.MaxPooling2D(pool_size=(2, 2)))
+# model.add(tf.keras.layers.Conv2D(32 , kernel_size=(3,3), activation ='relu')) #input_shape=(IMG_SIZE,IMG_SIZE,3)))
+# model.add(tf.keras.layers.MaxPooling2D(pool_size=(2, 2)))
 model.add(tf.keras.layers.Conv2D(64, (3,3), activation='relu'))
 model.add(tf.keras.layers.MaxPooling2D(pool_size=(2,2)))
 model.add(tf.keras.layers.Flatten())
@@ -77,11 +82,11 @@ adam = tf.keras.optimizers.Adam(learning_rate = 0.001)
 
 
 # sgd = tf.keras.optimizers.SGD(learning_rate = 0.000001) #, momentum=0.99, decay= 0.0003)
-reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.2, patience=10, min_lr=0.0001)
+reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.3, patience=10, min_lr=0.003)
 
 
 model.compile(
-    optimizer=adam,
+    optimizer=sgd,
     loss = 'binary_crossentropy',
     metrics=['accuracy', Precision(), Recall(), tfa.metrics.F1Score(num_classes=1, average='macro', threshold=0.5)]
     # metrics = 'accuracy'
@@ -94,7 +99,7 @@ model.compile(
 # print("\nclass label: ",class_label)
 
 csv_logger = CSVLogger(args["csvName"])
-early_stopping = EarlyStopping(monitor='val_loss', mode = 'min', verbose=1, patience=10)
+early_stopping = EarlyStopping(monitor='val_loss', mode = 'min', verbose=1, patience=30)
 # reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.3, patience=10, min_lr=0.001)
 
 # class_weight = compute_class_weight(class_weight='balanced', classes = np.unique(class_label), y = class_label)
@@ -105,8 +110,9 @@ history = model.fit(
     epochs=EPOCHS,
     batch_size=BATCH_SIZE,
     verbose = 1,
+    # validation_split=0.2,
     # class_weight=class_weight,
-    callbacks = [csv_logger, reduce_lr],
+    callbacks = [csv_logger, early_stopping],
     validation_data=validation_dataset,
 )
 

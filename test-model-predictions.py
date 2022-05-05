@@ -35,7 +35,7 @@ ap.add_argument("-l", "--loadModel", default=r'C:\Users\Malene\OneDrive - NTNU\D
 args = vars(ap.parse_args())
 
 LOADED_MODEL = args["loadModel"]
-IMG_SIZE = 256
+IMG_SIZE = 128
 SEED_VALUE = 1
 BATCH_SIZE = args["batchsize"]
 
