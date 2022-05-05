@@ -34,8 +34,6 @@ args = vars(ap.parse_args())
 
 EPOCHS = args["epochs"]
 BATCH_SIZE = args["batchsize"]
-TESTING_SIZE = 0.75
-VALIDATION_SIZE = 0.1
 IMG_SIZE = 224
 SEED_VALUE = 30
 lenValidation = len(list(paths.list_images(args["validation"])))
@@ -44,7 +42,6 @@ print("lenValidation ", lenValidation)
 #Decalre dataset for training split
 train_datagen = ImageDataGenerator(
     preprocessing_function=preprocess_input,
-    # validation_split=VALIDATION_SIZE,
     rotation_range=30,
     height_shift_range=0.2,
     # width_shift_range=0.2,
@@ -60,13 +57,11 @@ train_img_generator = train_datagen.flow_from_directory(
     class_mode = 'binary',
     seed = SEED_VALUE,
     shuffle=False,
-    # color_mode = 'rgb',
-    # subset = 'training'
+
     )
 
 img_validation_generator = ImageDataGenerator(
     preprocessing_function=preprocess_input,
-    # validation_split=VALIDATION_SIZE,
     rotation_range=30,
     height_shift_range=0.2,
     vertical_flip = True,
@@ -78,11 +73,9 @@ validation_img_generator = img_validation_generator.flow_from_directory(
     directory = args["validation"],
     target_size = (IMG_SIZE,IMG_SIZE),
     batch_size = 10,
-    # batch_size = BATCH_SIZE,
     class_mode = 'binary',
     seed = SEED_VALUE,
     shuffle=False,
-    # subset = 'validation',
     )
 
 testing_generator = img_validation_generator.flow_from_directory(
@@ -117,7 +110,7 @@ pretrained_resnet101 = Model(inputs=pretrained_resnet101.input, outputs = output
 #see: https://pyimagesearch.com/2019/07/22/keras-learning-rate-schedules-and-decay/
 epochNumb = args["epochs"]
 # adam = tf.keras.optimizers.Adam(learning_rate = 0.001, decay=0.001/epochNum)
-adam = tf.keras.optimizers.Adam(learning_rate = 0.0001)
+# adam = tf.keras.optimizers.Adam(learning_rate = 0.0001)
 sgd = tf.keras.optimizers.SGD(learning_rate = 0.001)#0, decay = 0.0001)
 
 #Define learning decay after n iterations
