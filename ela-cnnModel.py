@@ -32,7 +32,7 @@ args = vars(ap.parse_args())
 
 EPOCHS = args["epochs"]
 BATCH_SIZE = args["batchsize"]
-IMG_SIZE = 256
+IMG_SIZE = 128
 SEED_VALUE = 30
 
 train_dataset = tf.keras.preprocessing.image_dataset_from_directory(
@@ -77,7 +77,7 @@ adam = tf.keras.optimizers.Adam(learning_rate = 0.001)
 
 
 # sgd = tf.keras.optimizers.SGD(learning_rate = 0.000001) #, momentum=0.99, decay= 0.0003)
-reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.2, patience=10, min_lr=0.0001)
+reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.3, patience=10, min_lr=0.003)
 
 
 model.compile(
