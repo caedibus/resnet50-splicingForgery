@@ -27,8 +27,6 @@ ap.add_argument("-b", "--batchsize", type=int, default =32, help = "Number of ba
 ap.add_argument("-fn", "--csvName", default='res101-saved-output.csv', help ="Filename of csv output")
 ap.add_argument("-sm", "--saveModel", default='res101-save_model2', help ="saved model output")
 ap.add_argument("-v","--validation", default = r'C:\Users\Malene\OneDrive - NTNU\Documents\NTNU\MasterThesis-2022\Code-testing\CASIA2-NEW-trainValTest-ELA-quality90\validation', help="Path to validation directory")
-ap.add_argument("-test","--testDirectory", default = r'C:\Users\Malene\OneDrive - NTNU\Documents\NTNU\MasterThesis-2022\Code-testing\CASIA2-NEW-trainValTest-ELA-quality90\test', help="Path to testing directory")
-
 args = vars(ap.parse_args())
 
 
@@ -78,14 +76,14 @@ validation_img_generator = img_validation_generator.flow_from_directory(
     shuffle=False,
     )
 
-testing_generator = img_validation_generator.flow_from_directory(
-    directory = args["testDirectory"],
-    target_size=(IMG_SIZE,IMG_SIZE),
-    batch_size = BATCH_SIZE,
-    class_mode = 'binary',
-    seed = SEED_VALUE,
-    shuffle=False,
-)
+#testing_generator = img_validation_generator.flow_from_directory(
+#    directory = args["testDirectory"],
+#    target_size=(IMG_SIZE,IMG_SIZE),
+#    batch_size = BATCH_SIZE,
+#    class_mode = 'binary',
+#    seed = SEED_VALUE,
+#    shuffle=False,
+#)
 
 inputTensor = keras.Input(shape=(IMG_SIZE, IMG_SIZE, 3))
 
@@ -105,12 +103,16 @@ output = keras.layers.Dense(1, activation='sigmoid')(output)  #Only use softmax 
 pretrained_resnet101 = Model(inputs=pretrained_resnet101.input, outputs = output)
 
 
-#see: https://pyimagesearch.com/2019/07/22/keras-learning-rate-schedules-and-decay/
 epochNumb = args["epochs"]
 # adam = tf.keras.optimizers.Adam(learning_rate = 0.001, decay=0.001/epochNum)
 # adam = tf.keras.optimizers.Adam(learning_rate = 0.0001)
 sgd = tf.keras.optimizers.SGD(learning_rate = 0.001)#0, decay = 0.0001)
 
+<<<<<<< HEAD
+=======
+# pretrained_resnet101.summary()
+
+>>>>>>> 71548d411f3b8cb275810eb5eedbc384db77ce8a
 print("Compile model:")
 pretrained_resnet101.compile(
     optimizer = sgd,
