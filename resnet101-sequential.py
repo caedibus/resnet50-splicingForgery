@@ -63,7 +63,7 @@ train_img_generator = train_datagen.flow_from_directory(
 img_validation_generator = ImageDataGenerator(
     preprocessing_function=preprocess_input,
     rotation_range=30,
-    height_shift_range=0.2,
+    height_shift_range=0.3,
     vertical_flip = True,
     horizontal_flip=True
 )
@@ -111,15 +111,6 @@ epochNumb = args["epochs"]
 # adam = tf.keras.optimizers.Adam(learning_rate = 0.0001)
 sgd = tf.keras.optimizers.SGD(learning_rate = 0.001)#0, decay = 0.0001)
 
-#Define learning decay after n iterations
-# def decay_LRscheduler(epoch, lr):
-#     if (epoch % 5 == 0) and (epoch != 0):
-#         lr = lr*0.10
-#     return  lr
-# learningRate = LearningRateScheduler(decay_LRscheduler)
-
-# pretrained_resnet101.summary()
-
 print("Compile model:")
 pretrained_resnet101.compile(
     optimizer = sgd,
@@ -146,10 +137,8 @@ history = pretrained_resnet101.fit(
     batch_size=BATCH_SIZE,
     verbose = 1,
     class_weight=class_weight,
-    callbacks = [csv_logger, reduce_lr, early_stopping],  #early_stopping
+    callbacks = [csv_logger, reduce_lr, early_stopping],
     validation_data=validation_img_generator,
-    # validation_steps = lenValidation,
-    # validation_steps=len(list(paths.list_images(args["validation"])))
 )
 
 # pretrained_resnet101.summary()

@@ -62,7 +62,7 @@ validation_dataset = tf.keras.preprocessing.image_dataset_from_directory(
 
 model = tf.keras.Sequential()
 model.add(tf.keras.layers.Conv2D(32 , kernel_size=(3,3), activation ='relu')) #input_shape=(IMG_SIZE,IMG_SIZE,3)))
-# model.add(Dropout(0.25))
+model.add(Dropout(0.25))
 model.add(tf.keras.layers.MaxPooling2D(pool_size=(2, 2)))
 # model.add(tf.keras.layers.Conv2D(32 , kernel_size=(3,3), activation ='relu')) #input_shape=(IMG_SIZE,IMG_SIZE,3)))
 # model.add(tf.keras.layers.MaxPooling2D(pool_size=(2, 2)))
@@ -83,7 +83,7 @@ adam = tf.keras.optimizers.Adam(learning_rate = 0.001)
 
 
 # sgd = tf.keras.optimizers.SGD(learning_rate = 0.000001) #, momentum=0.99, decay= 0.0003)
-# reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.3, patience=10, min_lr=0.001)
+reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.3, patience=10, min_lr=0.001)
 
 
 model.compile(
@@ -100,7 +100,7 @@ model.compile(
 # print("\nclass label: ",class_label)
 
 csv_logger = CSVLogger(args["csvName"])
-early_stopping = EarlyStopping(monitor='val_loss', mode = 'min', verbose=1, patience=10)
+early_stopping = EarlyStopping(monitor='val_loss', mode = 'min', verbose=1, patience=30)
 # reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.3, patience=10, min_lr=0.001)
 
 # class_weight = compute_class_weight(class_weight='balanced', classes = np.unique(class_label), y = class_label)

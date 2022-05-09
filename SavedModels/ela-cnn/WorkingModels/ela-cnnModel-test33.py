@@ -100,7 +100,7 @@ model.compile(
 # print("\nclass label: ",class_label)
 
 csv_logger = CSVLogger(args["csvName"])
-early_stopping = EarlyStopping(monitor='val_loss', mode = 'min', verbose=1, patience=10)
+early_stopping = EarlyStopping(monitor='val_loss', mode = 'min', verbose=1, patience=30)
 # reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.3, patience=10, min_lr=0.001)
 
 # class_weight = compute_class_weight(class_weight='balanced', classes = np.unique(class_label), y = class_label)
