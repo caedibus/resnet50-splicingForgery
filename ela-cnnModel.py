@@ -63,6 +63,7 @@ validation_dataset = tf.keras.preprocessing.image_dataset_from_directory(
 model = tf.keras.Sequential()
 model.add(tf.keras.layers.Conv2D(32 , kernel_size=(3,3), activation ='relu')) #input_shape=(IMG_SIZE,IMG_SIZE,3)))
 model.add(tf.keras.layers.MaxPooling2D(pool_size=(2, 2)))
+model.add(Dropout(0.25))
 # model.add(tf.keras.layers.Conv2D(32 , kernel_size=(3,3), activation ='relu')) #input_shape=(IMG_SIZE,IMG_SIZE,3)))
 # model.add(tf.keras.layers.MaxPooling2D(pool_size=(2, 2)))
 model.add(tf.keras.layers.Conv2D(64, (3,3), activation='relu'))
@@ -77,7 +78,7 @@ model.add(tf.keras.layers.Dense(1,activation='sigmoid'))
 #     decay_steps=10000,
 #     decay_rate=0.9)
 
-sgd = tf.keras.optimizers.SGD(learning_rate = 0.000001)
+sgd = tf.keras.optimizers.SGD(learning_rate = 0.0001)
 adam = tf.keras.optimizers.Adam(learning_rate = 0.001)
 
 
