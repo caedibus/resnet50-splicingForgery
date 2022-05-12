@@ -21,12 +21,12 @@ from tensorflow.keras.metrics import Precision, Recall
 
 
 ap = argparse.ArgumentParser()
-ap.add_argument("-t","--train", default = r'C:\Users\Malene\OneDrive - NTNU\Documents\NTNU\MasterThesis-2022\Code-testing\CASIA2-NEW-trainValTest-ELA-quality90\train', help="Path to training directory")
-ap.add_argument("-v","--validation", default = r'C:\Users\Malene\OneDrive - NTNU\Documents\NTNU\MasterThesis-2022\Code-testing\CASIA2-NEW-trainValTest-ELA-quality90\validation', help="Path to validation directory")
+ap.add_argument("-t","--train", default = r'C:\Users\Malene\OneDrive - NTNU\Documents\NTNU\MasterThesis-2022\Code-testing\CASIA2-NEW-trainValTest-80-20-ELA-90\train', help="Path to training directory")
+ap.add_argument("-v","--validation", default = r'C:\Users\Malene\OneDrive - NTNU\Documents\NTNU\MasterThesis-2022\Code-testing\CASIA2-NEW-trainValTest-80-20-ELA-90\validation', help="Path to validation directory")
 ap.add_argument("-e", "--epochs", type =int, default = 100, help ="Number of epochs for training")
 ap.add_argument("-b", "--batchsize", type=int, default =16, help = "Number of batch size")
 ap.add_argument("-fn", "--csvName", default='elaCNN-saved-output.csv', help ="Filename of csv output")
-ap.add_argument("-sm", "--saveModel", default='res101-save_model2', help ="saved model output")
+ap.add_argument("-sm", "--saveModel", default='ela-save_model2', help ="saved model output")
 args = vars(ap.parse_args())
 
 
@@ -62,7 +62,7 @@ validation_dataset = tf.keras.preprocessing.image_dataset_from_directory(
 
 model = tf.keras.Sequential()
 model.add(tf.keras.layers.Conv2D(32 , kernel_size=(3,3), activation ='relu')) #input_shape=(IMG_SIZE,IMG_SIZE,3)))
-model.add(Dropout(0.25))
+# model.add(Dropout(0.25))
 model.add(tf.keras.layers.MaxPooling2D(pool_size=(2, 2)))
 # model.add(tf.keras.layers.Conv2D(32 , kernel_size=(3,3), activation ='relu')) #input_shape=(IMG_SIZE,IMG_SIZE,3)))
 # model.add(tf.keras.layers.MaxPooling2D(pool_size=(2, 2)))
@@ -79,15 +79,15 @@ model.add(tf.keras.layers.Dense(1,activation='sigmoid'))
 #     decay_rate=0.9)
 
 sgd = tf.keras.optimizers.SGD(learning_rate = 0.00001)
-adam = tf.keras.optimizers.Adam(learning_rate = 0.001)
+# adam = tf.keras.optimizers.Adam(learning_rate = 0.0001)
 
 
 # sgd = tf.keras.optimizers.SGD(learning_rate = 0.000001) #, momentum=0.99, decay= 0.0003)
-reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.3, patience=10, min_lr=0.001)
+# reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.3, patience=10, min_lr=0.001)
 
 
 model.compile(
-    optimizer=adam,
+    optimizer=sgd,
     loss = 'binary_crossentropy',
     metrics=['accuracy', Precision(), Recall(), tfa.metrics.F1Score(num_classes=1, average='macro', threshold=0.5)]
     # metrics = 'accuracy'
@@ -100,7 +100,7 @@ model.compile(
 # print("\nclass label: ",class_label)
 
 csv_logger = CSVLogger(args["csvName"])
-early_stopping = EarlyStopping(monitor='val_loss', mode = 'min', verbose=1, patience=30)
+early_stopping = EarlyStopping(monitor='val_loss', mode = 'min', verbose=1, patience=10)
 # reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.3, patience=10, min_lr=0.001)
 
 # class_weight = compute_class_weight(class_weight='balanced', classes = np.unique(class_label), y = class_label)
