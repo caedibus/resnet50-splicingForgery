@@ -75,7 +75,7 @@ for layer in pretrained_resnet50.layers:
     layer.trainable = False
 output = pretrained_resnet50.output
 output = keras.layers.GlobalAveragePooling2D()(output)
-output = keras.layers.Flatten()(output)
+# output = keras.layers.Flatten()(output)
 output = keras.layers.Dense(256, activation='relu')(output)
 output = keras.layers.Dropout(0.25)(output)
 # output = keras.layers.Dense(256, activation='relu')(output)

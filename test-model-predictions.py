@@ -28,14 +28,14 @@ from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 
 ap = argparse.ArgumentParser()
 # ap.add_argument("-t","--training", required=True, help="Path to training directory")
-ap.add_argument("-test","--testDirectory", default = r'C:\Users\Malene\OneDrive - NTNU\Documents\NTNU\MasterThesis-2022\Code-testing\CASIA2-NEW-trainValTest-ELA-quality90\test', help="Path to testing directory")
+ap.add_argument("-test","--testDirectory", default = r'C:\Users\Malene\OneDrive - NTNU\Documents\NTNU\MasterThesis-2022\Code-testing\CASIA2-NEW-trainValTest-80-20-ELA-90\test', help="Path to testing directory")
 ap.add_argument("-b", "--batchsize", type=int, default =16, help = "Number of batch size")
-ap.add_argument("-l", "--loadModel", default=r'C:\Users\Malene\OneDrive - NTNU\Documents\NTNU\MasterThesis-2022\Code-testing\resnet50-splicingForgery\elaCNN-test17', help ="loaded model")
+ap.add_argument("-l", "--loadModel", default=r'C:\Users\Malene\OneDrive - NTNU\Documents\NTNU\MasterThesis-2022\Code-testing\resnet50-splicingForgery\ela-test33-8020', help ="loaded model")
 
 args = vars(ap.parse_args())
 
 LOADED_MODEL = args["loadModel"]
-IMG_SIZE = 128
+IMG_SIZE = 256
 SEED_VALUE = 1
 BATCH_SIZE = args["batchsize"]
 

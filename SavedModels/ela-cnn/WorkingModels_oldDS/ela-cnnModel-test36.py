@@ -21,8 +21,8 @@ from tensorflow.keras.metrics import Precision, Recall
 
 
 ap = argparse.ArgumentParser()
-ap.add_argument("-t","--train", default = r'C:\Users\Malene\OneDrive - NTNU\Documents\NTNU\MasterThesis-2022\Code-testing\CASIA2-trainValTest-80-20-ELA-90-CNNsplit\train', help="Path to training directory")
-# ap.add_argument("-v","--validation", default = r'C:\Users\Malene\OneDrive - NTNU\Documents\NTNU\MasterThesis-2022\Code-testing\CASIA2-NEW-trainValTest-80-20-ELA-90\validation', help="Path to validation directory")
+ap.add_argument("-t","--train", default = r'C:\Users\Malene\OneDrive - NTNU\Documents\NTNU\MasterThesis-2022\Code-testing\CASIA2-NEW-trainValTest-80-20-ELA-90\train', help="Path to training directory")
+ap.add_argument("-v","--validation", default = r'C:\Users\Malene\OneDrive - NTNU\Documents\NTNU\MasterThesis-2022\Code-testing\CASIA2-NEW-trainValTest-80-20-ELA-90\validation', help="Path to validation directory")
 ap.add_argument("-e", "--epochs", type =int, default = 100, help ="Number of epochs for training")
 ap.add_argument("-b", "--batchsize", type=int, default =16, help = "Number of batch size")
 ap.add_argument("-fn", "--csvName", default='elaCNN-saved-output.csv', help ="Filename of csv output")
@@ -32,7 +32,7 @@ args = vars(ap.parse_args())
 
 EPOCHS = args["epochs"]
 BATCH_SIZE = args["batchsize"]
-IMG_SIZE = 128
+IMG_SIZE = 256
 SEED_VALUE = 30
 
 train_dataset = tf.keras.preprocessing.image_dataset_from_directory(
@@ -41,10 +41,9 @@ train_dataset = tf.keras.preprocessing.image_dataset_from_directory(
     image_size = (IMG_SIZE,IMG_SIZE),
     color_mode = 'rgb',
     label_mode = 'binary',
-    shuffle = True,
-    seed = 42,
+    seed = 1,
     subset="training",
-    validation_split = 0.1,
+    validation_split = 0.2,
     labels="inferred"
 )
 
@@ -52,21 +51,19 @@ validation_dataset = tf.keras.preprocessing.image_dataset_from_directory(
     # args["validation"],
     args["train"],
     subset="validation",
-    validation_split = 0.1,
+    validation_split = 0.2,
     batch_size = BATCH_SIZE,
     image_size = (IMG_SIZE,IMG_SIZE),
     color_mode = 'rgb',
     label_mode = 'binary',
-    shuffle = True,
-    seed = 42,
+    seed = 1,
     labels="inferred"
 )
 
 model = tf.keras.Sequential()
 model.add(tf.keras.layers.Conv2D(32 , kernel_size=(3,3), activation ='relu')) #input_shape=(IMG_SIZE,IMG_SIZE,3)))
-model.add(Dropout(0.25))
+# model.add(Dropout(0.25))
 model.add(tf.keras.layers.MaxPooling2D(pool_size=(2, 2)))
-model.add(Dropout(0.25))
 # model.add(tf.keras.layers.Conv2D(32 , kernel_size=(3,3), activation ='relu')) #input_shape=(IMG_SIZE,IMG_SIZE,3)))
 # model.add(tf.keras.layers.MaxPooling2D(pool_size=(2, 2)))
 model.add(tf.keras.layers.Conv2D(64, (3,3), activation='relu'))
@@ -81,8 +78,8 @@ model.add(tf.keras.layers.Dense(1,activation='sigmoid'))
 #     decay_steps=10000,
 #     decay_rate=0.9)
 
-sgd = tf.keras.optimizers.SGD(learning_rate = 0.0001)
-adam = tf.keras.optimizers.Adam(learning_rate = 0.001)
+sgd = tf.keras.optimizers.SGD(learning_rate = 0.00001)
+# adam = tf.keras.optimizers.Adam(learning_rate = 0.0001)
 
 
 # sgd = tf.keras.optimizers.SGD(learning_rate = 0.000001) #, momentum=0.99, decay= 0.0003)

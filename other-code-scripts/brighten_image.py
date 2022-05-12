@@ -3,8 +3,8 @@ import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 
-path = r'C:\Users\Malene\OneDrive - NTNU\Documents\NTNU\MasterThesis-2022\Code-testing\CASIA2-NEW-trainValTest-jpg\test\Au'
-destination = r'C:\Users\Malene\OneDrive - NTNU\Documents\NTNU\MasterThesis-2022\Code-testing\CASIA2-cmsf-brighteningTEST\Au'
+path = r'C:\Users\Malene\OneDrive - NTNU\Documents\NTNU\MasterThesis-2022\Code-testing\CASIA2-NEW-trainValTest-80-20-jpg\test\Au'
+destination = r'C:\Users\Malene\OneDrive - NTNU\Documents\NTNU\MasterThesis-2022\Code-testing\TEST-dataset\CASIA2-cmsf-brighteningTEST\Brightened-jpg\Au'
 
 for object in os.listdir(path):
     print(path +'\\'+object)

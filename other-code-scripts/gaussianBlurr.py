@@ -6,9 +6,9 @@ import matplotlib.image as mpimg
 import matplotlib.pyplot as plt
 
 # image path
-path = r'C:\Users\Malene\OneDrive - NTNU\Documents\NTNU\MasterThesis-2022\Code-testing\CASIA2-NEW-trainValTest-jpg\test\Tp'
+path = r'C:\Users\Malene\OneDrive - NTNU\Documents\NTNU\MasterThesis-2022\Code-testing\CASIA2-NEW-trainValTest-80-20-jpg\test\Tp'
 # path =
-dest_path = r'C:\Users\Malene\OneDrive - NTNU\Documents\NTNU\MasterThesis-2022\Code-testing\CASIA2-cmsf-gaussianBlurrTEST\Tp'
+dest_path = r'C:\Users\Malene\OneDrive - NTNU\Documents\NTNU\MasterThesis-2022\Code-testing\TEST-dataset\CASIA2-cmsf-gaussianBlurrTEST\blurred-jpg-images\Tp'
 
 for file in os.listdir(path):
     #check if file is png image
